@@ -1,0 +1,310 @@
+import React, { useEffect, useState } from 'react';
+import { api } from '../../services/api';
+import { Button } from '../common/Button';
+import { Badge } from '../common/Badge';
+import { IconCheck, IconX, IconClock, IconBook, IconLock } from '../common/Icons';
+import {
+  clearQuizUiLock,
+  formatCountdown,
+  getLockStatus,
+  getQuizUiLock,
+  startQuizUiLock
+} from '../../services/quizCooldownStore';
+
+export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewContent, hideHeader = false }) {
+  const questions = item.questions || [];
+  
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState(null);
+  const [submitWarning, setSubmitWarning] = useState(false);
+  const [lock, setLock] = useState(() => getQuizUiLock(agentId, item.id));
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const stored = getQuizUiLock(agentId, item.id);
+    setLock(stored);
+    if (stored?.lastResult && !stored.lastResult.passed) {
+      setResult(stored.lastResult);
+      setSelectedAnswers({});
+    }
+  }, [agentId, item.id]);
+
+  const lockStatus = getLockStatus(lock);
+
+  useEffect(() => {
+    if (!lock || lockStatus.timeElapsed) return undefined;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [lock, lockStatus.timeElapsed]);
+
+  const liveStatus = getLockStatus(lock);
+  const remainingMs = lock ? Math.max(0, lock.lockedUntil - now) : 0;
+  const retakeLocked = liveStatus.isLocked;
+  const countdown = formatCountdown(remainingMs);
+
+  const handleToggleOption = (questionId, optionId, type) => {
+    if (retakeLocked) return;
+    if (result && !result.passed) {
+      setResult(null);
+    }
+    if (submitWarning) setSubmitWarning(false);
+
+    const currentSelected = selectedAnswers[questionId] || [];
+
+    if (type === 'multiple_choice' || type === 'true_false') {
+      setSelectedAnswers({
+        ...selectedAnswers,
+        [questionId]: [optionId]
+      });
+    } else {
+      const exists = currentSelected.includes(optionId);
+      const updated = exists
+        ? currentSelected.filter(id => id !== optionId)
+        : [...currentSelected, optionId];
+      setSelectedAnswers({
+        ...selectedAnswers,
+        [questionId]: updated
+      });
+    }
+  };
+
+  const handleSubmitQuiz = async (e) => {
+    e.preventDefault();
+    if (questions.length === 0) return;
+    if (getLockStatus(getQuizUiLock(agentId, item.id)).isLocked) return;
+
+    const formattedAnswers = questions.map(q => ({
+      question_id: q.id,
+      selected_option_ids: selectedAnswers[q.id] || []
+    }));
+
+    setSubmitting(true);
+    try {
+      const res = await api.learn.submitQuiz(item.id, courseId, agentId, formattedAnswers);
+      setResult(res);
+
+      if (res.passed) {
+        clearQuizUiLock(agentId, item.id);
+        setLock(null);
+        if (onQuizPassed) {
+          onQuizPassed();
+        }
+      } else {
+        const nextLock = startQuizUiLock({
+          agentId,
+          courseId,
+          quizItemId: item.id,
+          lastResult: res
+        });
+        setLock(nextLock);
+        setNow(Date.now());
+        setSelectedAnswers({});
+        const scrollContainer = document.querySelector('main');
+        if (scrollContainer) {
+          scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const allAnswered = questions.every(q => (selectedAnswers[q.id]?.length || 0) > 0);
+  const submitDisabled = submitting || (result && result.passed) || retakeLocked;
+
+  return (
+    <div className={hideHeader ? 'space-y-8 w-full' : 'bg-white dark:bg-zinc-900 rounded-lg py-10 space-y-8 w-full'}>
+      {/* Quiz Header — only shown when not embedded inside CourseViewer */}
+      {!hideHeader && (
+        <div className="pb-5 border-b border-zinc-100 dark:border-zinc-800 flex items-start justify-between gap-5">
+          <div>
+            <span className="text-xs tabular-nums font-black text-watermelon-green-600 dark:text-watermelon-green-400 uppercase tracking-wider">
+              ● KNOWLEDGE ASSESSMENT (100% MASTERY REQUIRED)
+            </span>
+            <h2 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 mt-2">
+              {item.title}
+            </h2>
+            <p className="text-sm text-zinc-500 mt-1">
+              Achieve 100% accuracy to pass. A failed attempt starts a 5-minute review cooldown before the next try.
+            </p>
+          </div>
+          <Badge variant="neutral" className="px-3 py-1 text-xs font-bold tabular-nums">
+            {questions.length} Questions
+          </Badge>
+        </div>
+      )}
+
+      {/* Result Status Banner */}
+      {result && !result.passed && (
+        <div className="p-5 rounded-lg bg-watermelon-red-50 dark:bg-watermelon-red-950/40 flex items-start space-x-4">
+          <div className="p-2 rounded-lg bg-watermelon-red-200 dark:bg-watermelon-red-900 text-watermelon-red-900 dark:text-watermelon-red-100">
+            <IconX className="w-5 h-5" />
+          </div>
+          <div className="flex-1 space-y-3">
+            <div className="space-y-1">
+              <h4 className="text-base font-black text-watermelon-red-900 dark:text-watermelon-red-200">
+                Score: {result.score} ({result.score_percentage}%) — Retake locked
+              </h4>
+              <p className="text-sm text-watermelon-red-800 dark:text-watermelon-red-300">
+                100% is required. Review the highlighted questions, then open the course content. You can retry only after the cooldown and after you have opened a previous module.
+              </p>
+            </div>
+
+            {retakeLocked && (
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/70 dark:bg-zinc-950/40">
+                  <IconClock className="w-4 h-4 text-watermelon-red-800 dark:text-watermelon-red-300" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-watermelon-red-800 dark:text-watermelon-red-300">
+                    Cooldown
+                  </span>
+                  <span className="text-base font-black tabular-nums text-watermelon-red-900 dark:text-watermelon-red-100">
+                    {liveStatus.timeElapsed ? '00:00' : countdown}
+                  </span>
+                </div>
+                <Badge
+                  variant={liveStatus.reviewSatisfied ? 'completed' : 'not_started'}
+                  className="w-36 justify-center text-center font-bold"
+                >
+                  {liveStatus.reviewSatisfied ? 'Content reviewed' : 'Review required'}
+                </Badge>
+              </div>
+            )}
+
+            {retakeLocked && onReviewContent && (
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                onClick={onReviewContent}
+                className="whitespace-nowrap"
+              >
+                <IconBook className="w-4 h-4" />
+                <span>Review course content</span>
+              </Button>
+            )}
+
+            {liveStatus.timeElapsed && !liveStatus.reviewSatisfied && (
+              <p className="text-sm font-bold text-watermelon-red-900 dark:text-watermelon-red-200">
+                Cooldown finished. Open a previous video or SOP in the sidebar, then return here to retry.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {result && result.passed && (
+        <div className="p-5 rounded-lg bg-watermelon-green-50 dark:bg-watermelon-green-950/50 flex items-start space-x-4">
+          <div className="p-2 rounded-lg bg-watermelon-green-200 dark:bg-watermelon-green-900 text-watermelon-green-900 dark:text-watermelon-green-100">
+            <IconCheck className="w-5 h-5" />
+          </div>
+          <div className="flex-1 space-y-1">
+            <h4 className="text-base font-black text-watermelon-green-900 dark:text-watermelon-green-200">
+              Assessment Mastered! Score: {result.score} (100%)
+            </h4>
+            <p className="text-sm text-watermelon-green-800 dark:text-watermelon-green-300">
+              You have passed this module assessment with 100% mastery. Proceed to the next section.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Questions Form */}
+      <form onSubmit={handleSubmitQuiz} className="space-y-8">
+        {questions.map((q, idx) => {
+          const selected = selectedAnswers[q.id] || [];
+          const wasIncorrect = result?.incorrect_question_ids?.includes(q.id);
+
+          return (
+            <div
+              key={q.id}
+              className={`py-6 px-0 rounded-lg transition-colors ${
+                wasIncorrect
+                  ? 'bg-watermelon-red-50/50 dark:bg-watermelon-red-950/20'
+                  : 'bg-zinc-50 dark:bg-zinc-950/60'
+              }`}
+            >
+              <div className="flex items-start gap-4 mb-4">
+                <div className="flex items-start space-x-3">
+                  <span className="text-sm tabular-nums font-black text-watermelon-green-700 dark:text-watermelon-green-400 mt-0.5">
+                    0{idx + 1}.
+                  </span>
+                  <p className="text-base font-bold text-zinc-900 dark:text-zinc-100 leading-snug">
+                    {q.prompt}
+                  </p>
+                </div>
+              </div>
+
+              {/* Options */}
+              <div className="space-y-2.5 pl-7">
+                {(q.options || []).map((opt) => {
+                  const isChecked = selected.includes(opt.id);
+
+                  return (
+                    <label
+                      key={opt.id}
+                      onClick={() => handleToggleOption(q.id, opt.id, q.type)}
+                      className={`flex items-center space-x-3.5 p-4 rounded-lg select-none transition-all ${
+                        retakeLocked ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
+                      } ${
+                        isChecked
+                          ? 'bg-watermelon-green-50 text-zinc-900 dark:bg-watermelon-green-950/60 dark:text-watermelon-green-100 font-bold'
+                          : 'bg-white dark:bg-zinc-900 hover:bg-zinc-100/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium'
+                      }`}
+                    >
+                      {/* Always a square checkbox, green bg + black ✓ when selected */}
+                      <div
+                        className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded ${
+                          isChecked
+                            ? 'bg-watermelon-green-500'
+                            : 'border-2 border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800'
+                        }`}
+                      >
+                        {isChecked && (
+                          <IconCheck className="w-3.5 h-3.5 text-zinc-950" />
+                        )}
+                      </div>
+                      <span className="text-sm">{opt.text}</span>
+                    </label>
+                  );
+                })}
+              </div>
+
+            </div>
+          );
+        })}
+
+        {/* Submit Button */}
+        <div className="flex flex-col items-center gap-3 pt-6 border-t border-zinc-100 dark:border-zinc-800">
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            className="px-8 py-3 font-black text-base"
+            disabled={submitDisabled}
+            onClick={() => { if (!allAnswered && !retakeLocked) setSubmitWarning(true); }}
+          >
+            {submitting ? (
+              'Evaluating Assessment...'
+            ) : retakeLocked ? (
+              <>
+                <IconLock className="w-4 h-4" />
+                <span>
+                  {liveStatus.timeElapsed
+                    ? 'Review content to unlock retry'
+                    : `Retry locked · ${countdown}`}
+                </span>
+              </>
+            ) : (
+              'Submit Assessment'
+            )}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
