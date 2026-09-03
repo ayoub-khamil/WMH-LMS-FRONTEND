@@ -93,9 +93,29 @@ export function CourseViewer({
     return allItems.find(i => i.type !== 'quiz') || null;
   })();
 
+  // Sequential gating: deep links to locked items bounce to first incomplete.
+  useEffect(() => {
+    if (loading || !course || allItems.length === 0 || !activeItemId) return;
+    const idx = allItems.findIndex(i => i.id === Number(activeItemId));
+    if (idx > 0 && !allItems.slice(0, idx).every(i => completedItemIds.includes(i.id))) {
+      const target = allItems.find(i => !completedItemIds.includes(i.id)) || allItems[0];
+      if (target && target.id !== Number(activeItemId)) onSelectItem(target.id, { replace: true });
+    }
+  }, [loading, course, activeItemId, completedItemIds]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Every item change starts at the top of the scroll pane.
+  // (The pane is <main>, not window — window.scrollTo is a no-op here.)
+  useEffect(() => {
+    const scroller = document.querySelector('main');
+    if (scroller) scroller.scrollTo({ top: 0 });
+    else window.scrollTo(0, 0);
+  }, [courseId, activeItemId]);
+
   useEffect(() => {
     if (!user?.id || !course?.id || !currentItem || currentItem.type === 'quiz') return;
     markQuizContentReviewed(user.id, course.id, currentItem.id);
+    // Mirror to the server review gate (authoritative for quiz unlock).
+    api.learn.recordView(user.id, course.id, currentItem.id).catch(() => {});
   }, [user?.id, course?.id, currentItem?.id, currentItem?.type]);
 
   const handleReviewContent = () => {
@@ -266,23 +286,31 @@ export function CourseViewer({
           </div>
         )}
 
-        {/* If Quiz is 100% Passed, show Continue button to proceed */}
+        {/* If Quiz is 100% Passed, show the same progression bar as lessons */}
         {currentItem?.type === 'quiz' && isCurrentCompleted && !isLastItem && (
-          <div className="mt-10 flex justify-end">
-            <Button
-              variant="primary"
-              size="lg"
-              className="px-8 py-3 text-base font-black"
-              onClick={() => {
-                if (nextItem) {
-                  onSelectItem(nextItem.id);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }
-              }}
-            >
-              <span>Continue to Next Module</span>
-              <IconArrowRight className="w-5 h-5" />
-            </Button>
+          <div className="mt-14 pt-8 border-t border-zinc-100 dark:border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-5 bg-gradient-to-r from-watermelon-green-50/50 to-transparent dark:from-watermelon-green-950/20 p-6 rounded-lg">
+            <div className="text-sm text-zinc-600 dark:text-zinc-400">
+              <span>
+                Next module: <strong className="text-zinc-900 dark:text-zinc-100 font-bold">{nextItem?.title || 'Next Module'}</strong>
+              </span>
+            </div>
+
+            <div className="flex items-center space-x-4 w-full sm:w-auto">
+              <Button
+                variant="primary"
+                size="lg"
+                className="w-full sm:w-auto px-10 py-3.5 text-base font-black tracking-wide"
+                onClick={() => {
+                  if (nextItem) {
+                    onSelectItem(nextItem.id);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }
+                }}
+              >
+                <span>Continue to Next Module</span>
+                <IconArrowRight className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
         )}
       </div>

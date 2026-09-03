@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Navigate,
   Outlet,
@@ -155,34 +155,6 @@ function AppLayout() {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-zinc-50/70 dark:bg-zinc-950">
 
-      {currentView === 'agent_course_viewer' && (
-        <div className="fixed top-3 right-4 z-50 flex items-center gap-3">
-          <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate max-w-[180px] sm:max-w-none">
-            {user.name || user.email}
-          </span>
-
-          <button
-            onClick={() => {
-              logout();
-            }}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm font-bold text-zinc-600 dark:text-zinc-300 hover:text-watermelon-red-600 dark:hover:text-watermelon-red-400 hover:border-watermelon-red-200 dark:hover:border-watermelon-red-900/60 transition-colors cursor-pointer shadow-sm flex-shrink-0"
-            title="Sign Out"
-          >
-            <IconLogout className="w-4 h-4" />
-            <span className="hidden md:inline">Sign Out</span>
-          </button>
-
-          <button
-            onClick={toggleTheme}
-            aria-label="Toggle Theme"
-            className="p-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer shadow-sm flex-shrink-0"
-            title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
-          >
-            {theme === 'dark' ? <IconSun className="w-4 h-4" /> : <IconMoon className="w-4 h-4" />}
-          </button>
-        </div>
-      )}
-
       <div className="flex-1 flex overflow-hidden">
         {showSidebar && (
           <Sidebar
@@ -213,7 +185,34 @@ function AppLayout() {
             <TopNav {...getManagerTopNav()} />
           )}
 
-          <main className="flex-1 overflow-y-auto [scrollbar-gutter:stable]">
+          <main className={`flex-1 ${currentView === 'agent_course_viewer' ? 'overflow-y-scroll course-scroll' : 'overflow-y-auto'} [scrollbar-gutter:stable]`}>
+            {currentView === 'agent_course_viewer' && (
+              <div className="flex items-center justify-end gap-3 px-8 md:px-10 pt-4">
+                <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate max-w-[180px] sm:max-w-none">
+                  {user.name || user.email}
+                </span>
+
+                <button
+                  onClick={() => {
+                    logout();
+                  }}
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm font-bold text-zinc-600 dark:text-zinc-300 hover:text-watermelon-red-600 dark:hover:text-watermelon-red-400 hover:border-watermelon-red-200 dark:hover:border-watermelon-red-900/60 transition-colors cursor-pointer shadow-sm flex-shrink-0"
+                  title="Sign Out"
+                >
+                  <IconLogout className="w-4 h-4" />
+                  <span className="hidden md:inline">Sign Out</span>
+                </button>
+
+                <button
+                  onClick={toggleTheme}
+                  aria-label="Toggle Theme"
+                  className="p-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer shadow-sm flex-shrink-0"
+                  title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+                >
+                  {theme === 'dark' ? <IconSun className="w-4 h-4" /> : <IconMoon className="w-4 h-4" />}
+                </button>
+              </div>
+            )}
             <div className="w-full p-8 md:p-10">
               <Outlet context={{
                 progressRefreshKey,
@@ -231,6 +230,18 @@ function AppContent() {
   const { user, authLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const prevUserRef = useRef(user);
+
+  // Keep URL and auth state in agreement: on the transition from
+  // logged-in to logged-out (manual sign-out or 401), reset to '/'
+  // so a stale protected URL can never linger behind the login screen.
+  // Fresh logged-out visits keep their deep link for post-login resume.
+  useEffect(() => {
+    if (!authLoading && prevUserRef.current && !user) {
+      navigate('/', { replace: true });
+    }
+    prevUserRef.current = user;
+  }, [user, authLoading, navigate]);
 
   if (authLoading) {
     return (

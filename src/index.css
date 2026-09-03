@@ -7,7 +7,11 @@
     box-shadow: none !important;
   }
 
-  html, body, main {
+  html, body {
+    scrollbar-gutter: auto;
+  }
+
+  main {
     scrollbar-gutter: stable;
   }
 
@@ -30,6 +34,32 @@
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-watermelon-green-400 dark:bg-watermelon-green-600;
   }
+}
+
+/* Course page scrollbar arrow buttons (same width and gray as the sidebar) */
+main.course-scroll {
+  border-right: 1.5px solid transparent;
+}
+main.course-scroll::-webkit-scrollbar-button:single-button {
+  display: block;
+  background: transparent;
+  height: 12px;
+}
+main.course-scroll::-webkit-scrollbar-button:single-button:vertical:decrement {
+  border-width: 0 3px 6px 3px;
+  border-style: solid;
+  border-color: transparent transparent #D4D4D8 transparent;
+}
+main.course-scroll::-webkit-scrollbar-button:single-button:vertical:increment {
+  border-width: 6px 3px 0 3px;
+  border-style: solid;
+  border-color: #D4D4D8 transparent transparent transparent;
+}
+html.dark main.course-scroll::-webkit-scrollbar-button:single-button:vertical:decrement {
+  border-color: transparent transparent #3F3F46 transparent;
+}
+html.dark main.course-scroll::-webkit-scrollbar-button:single-button:vertical:increment {
+  border-color: #3F3F46 transparent transparent transparent;
 }
 
 /* Watermelon Dual-Tone Top Ribbon */

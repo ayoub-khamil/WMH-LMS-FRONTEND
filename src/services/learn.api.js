@@ -7,10 +7,11 @@ import { http } from './httpClient';
  * GET  /learn/courses/:id/resume?agent_id= -> {next_item_id}
  * POST /learn/complete {item_id,course_id,agent_id}
  * POST /learn/quiz/submit {item_id,course_id,agent_id,answers}
+ * POST /learn/views {agent_id,course_id,viewed_item_id} (review gate)
+ * GET  /learn/quiz/lock?agent_id&item_id (server lock status)
  *
- * NOTE: quiz retake cooldown stays UI-only (sessionStorage,
- * services/quizCooldownStore.js) until the backend adds
- * getQuizLock/recordItemView endpoints.
+ * NOTE: sessionStorage (services/quizCooldownStore.js) remains as a fast
+ * local mirror, but the server lock is authoritative and survives reloads.
  */
 export const learnApi = {
   getCourses(agentId) {
@@ -32,5 +33,18 @@ export const learnApi = {
       agent_id: agentId,
       answers
     });
+  },
+  recordView(agentId, courseId, viewedItemId) {
+    return http.post('/learn/views', {
+      agent_id: agentId,
+      course_id: courseId,
+      viewed_item_id: viewedItemId
+    });
+  },
+  getQuizLock(agentId, itemId) {
+    return http.get('/learn/quiz/lock', { params: { agent_id: agentId, item_id: itemId } });
+  },
+  resetQuizLock(agentId, itemId) {
+    return http.del('/dev/quiz-lock', undefined, { params: { agent_id: agentId, item_id: itemId } });
   }
 };

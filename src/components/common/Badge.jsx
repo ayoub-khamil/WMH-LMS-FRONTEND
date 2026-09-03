@@ -6,9 +6,9 @@ export function Badge({ variant = 'neutral', children, className = '' }) {
     neutral:      'bg-zinc-500 text-white dark:bg-zinc-600 dark:text-white',
     dark:         'bg-zinc-800 text-white dark:bg-zinc-200 dark:text-zinc-900',
 
-    // ── Role badges ───────────────────────────────────────────────────────────
-    role_agent:   'bg-white text-black border-2 border-black text-xs dark:bg-white dark:text-black dark:border-2 dark:border-black',
-    role_manager: 'bg-watermelon-red-100 text-black border-2 border-black text-xs dark:bg-watermelon-red-200 dark:text-black dark:border-2 dark:border-black',
+    // ── Role badges (outlined to stay distinct from solid status pills) ──────
+    role_agent:   'bg-transparent text-watermelon-green-700 border border-watermelon-green-500 dark:text-watermelon-green-300 dark:border-watermelon-green-500',
+    role_manager: 'bg-transparent text-watermelon-red-600 border border-watermelon-red-500 dark:text-watermelon-red-300 dark:border-watermelon-red-500',
 
     // ── Assignment / progress statuses ────────────────────────────────────────
     completed:    'bg-[#4ADE80] text-white dark:bg-[#16a34a] dark:text-white',

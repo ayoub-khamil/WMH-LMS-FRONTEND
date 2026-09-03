@@ -10,7 +10,7 @@ export function Button({
   type = 'button',
   ...props
 }) {
-  const base = 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed rounded-md border select-none';
+  const base = 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none disabled:opacity-50 rounded-md border select-none';
 
   const sizes = {
     sm: 'text-xs px-2.5 py-1.5 gap-1.5',

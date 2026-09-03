@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
@@ -14,7 +14,8 @@ import {
   IconQuestionMarkCircle,
   IconAudio,
   IconDownload,
-  IconCheck
+  IconCheck,
+  IconLock
 } from '../common/Icons';
 import { downloadCertificatePDF } from '../../services/certificate';
 
@@ -50,19 +51,19 @@ function ItemTypeIcon({ type, className = '' }) {
   }
 }
 
-// ── Circle-check badge matching the reference image style ────────
+// ── Circle-check badge: green check means DONE, never just selected ────────
 function CheckCircle({ done, active }) {
-  if (active) {
-    return (
-      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-watermelon-green-500 flex items-center justify-center">
-        <IconCheck className="w-3.5 h-3.5 text-white" />
-      </span>
-    );
-  }
   if (done) {
     return (
       <span className="flex-shrink-0 w-6 h-6 rounded-full bg-watermelon-green-400 flex items-center justify-center">
         <IconCheck className="w-3.5 h-3.5 text-white" />
+      </span>
+    );
+  }
+  if (active) {
+    return (
+      <span className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-watermelon-green-500 bg-white dark:bg-zinc-900 flex items-center justify-center">
+        <span className="w-2 h-2 rounded-full bg-watermelon-green-500" />
       </span>
     );
   }
@@ -87,6 +88,12 @@ export function Sidebar({
   const [agentCourses,    setAgentCourses]    = useState([]);
   const [activeCourseTree, setActiveCourseTree] = useState(null);
   const [loadingCurriculum, setLoadingCurriculum] = useState(false);
+  const activeItemRef = useRef(null);
+
+  // ── Keep the current item visible as the agent progresses ──────────────
+  useEffect(() => {
+    activeItemRef.current?.scrollIntoView({ block: 'nearest' });
+  }, [activeItemId, activeCourseTree]);
 
   // ── Load enrolled courses list ───────────────────────────────
   useEffect(() => {
@@ -116,6 +123,14 @@ export function Sidebar({
   const completedCount= allItems.filter(i => completedIds.includes(i.id)).length;
   const progressPct   = totalItems > 0 ? Math.round((completedCount / totalItems) * 100) : 0;
   const isCourseComplete = totalItems > 0 && completedCount >= totalItems;
+
+  // ── Sequential gating: item N unlocks only when all items before it are done ──
+  const orderIndex = new Map(allItems.map((it, idx) => [it.id, idx]));
+  const isItemLocked = (itemId) => {
+    const idx = orderIndex.get(itemId) ?? 0;
+    if (idx <= 0) return false;
+    return !allItems.slice(0, idx).every(x => completedIds.includes(x.id));
+  };
 
   const handleDownloadCert = (course) => {
     downloadCertificatePDF({
@@ -255,23 +270,35 @@ export function Sidebar({
                     {secItems.map((item, iIdx) => {
                       const isDone     = completedIds.includes(item.id);
                       const isSelected = Number(activeItemId) === Number(item.id) && currentView === 'agent_course_viewer';
+                      const isLocked   = !isManager && isItemLocked(item.id);
 
                       return (
                         <React.Fragment key={item.id}>
                           <button
-                            onClick={() => {
+                            ref={isSelected ? activeItemRef : null}
+                            disabled={isLocked}
+                            title={isLocked ? 'Complete previous modules to unlock' : item.title}
+                            onClick={isLocked ? undefined : () => {
                               onSelectItem(item.id);
                               if (currentView !== 'agent_course_viewer') onViewChange('agent_course_viewer');
                             }}
                             className={`w-full text-left flex items-start gap-3 px-5 py-3.5 transition-colors ${
-                              isSelected
+                              isLocked
+                                ? 'opacity-50'
+                                : isSelected
                                 ? 'bg-watermelon-green-50 dark:bg-watermelon-green-950/40'
                                 : 'hover:bg-zinc-50 dark:hover:bg-zinc-900/60'
                             }`}
                           >
                             {/* Circle check (reference style) */}
                             <div className="mt-0.5 flex-shrink-0">
-                              <CheckCircle done={isDone} active={isSelected} />
+                              {isLocked ? (
+                                <span className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                                  <IconLock className="w-3 h-3 text-zinc-400 dark:text-zinc-500" />
+                                </span>
+                              ) : (
+                                <CheckCircle done={isDone} active={isSelected} />
+                              )}
                             </div>
 
                             {/* Type icon (lines / play / etc) */}
@@ -279,15 +306,18 @@ export function Sidebar({
                               <ItemTypeIcon
                                 type={item.type}
                                 className={`w-4 h-4 ${
-                                  isSelected ? 'text-watermelon-green-600 dark:text-watermelon-green-400'
-                                             : 'text-zinc-400'
+                                  isLocked ? 'text-zinc-300 dark:text-zinc-600'
+                                    : isSelected ? 'text-watermelon-green-600 dark:text-watermelon-green-400'
+                                    : 'text-zinc-400'
                                 }`}
                               />
                             </div>
 
                             {/* Title with responsive text wrapping */}
                             <span className={`text-sm leading-snug flex-1 min-w-0 break-words whitespace-normal ${
-                              isSelected
+                              isLocked
+                                ? 'font-medium text-zinc-400 dark:text-zinc-600'
+                                : isSelected
                                 ? 'font-bold text-zinc-900 dark:text-zinc-100'
                                 : isDone
                                 ? 'font-semibold text-zinc-700 dark:text-zinc-300'

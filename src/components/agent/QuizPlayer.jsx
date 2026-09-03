@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
@@ -17,10 +18,37 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
-  const [submitWarning, setSubmitWarning] = useState(false);
   const [lock, setLock] = useState(() => getQuizUiLock(agentId, item.id));
   const [now, setNow] = useState(Date.now());
   const [error, setError] = useState('');
+  const [showIncompleteHint, setShowIncompleteHint] = useState(false);
+  const [searchParams] = useSearchParams();
+  // Testing hook: only visible with ?autofill in the URL. Never shown otherwise.
+  const showAutofill = searchParams.has('autofill');
+
+  const handleAutofillCorrect = () => {
+    if (retakeLocked) return;
+    const filled = {};
+    for (const q of questions) {
+      filled[q.id] = (q.options || []).filter(o => o.is_correct).map(o => o.id);
+    }
+    setSelectedAnswers(filled);
+    setResult(null);
+    setSubmitWarning(false);
+  };
+
+  const handleResetTimer = async () => {
+    try {
+      await api.learn.resetQuizLock(agentId, item.id);
+    } catch {
+      // Dev helper only; server errors must not block local unlock.
+    }
+    clearQuizUiLock(agentId, item.id);
+    setLock(null);
+    setResult(null);
+    setSelectedAnswers({});
+    setNow(Date.now());
+  };
 
   useEffect(() => {
     const stored = getQuizUiLock(agentId, item.id);
@@ -29,7 +57,31 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
       setResult(stored.lastResult);
       setSelectedAnswers({});
     }
-  }, [agentId, item.id]);
+    // Server lock is authoritative (survives reload / new tab).
+    let cancelled = false;
+    api.learn.getQuizLock(agentId, item.id)
+      .then((s) => {
+        if (cancelled || !s || s.can_retry) return;
+        let lastResult = null;
+        try { lastResult = s.last_result ? JSON.parse(s.last_result) : null; }
+        catch { lastResult = null; }
+        setLock({
+          agentId,
+          courseId,
+          quizItemId: item.id,
+          lockedUntil: Date.now() + (s.remaining_seconds || 0) * 1000,
+          reviewedItemIds: s.review_satisfied ? ['server'] : [],
+          lastResult
+        });
+        if (lastResult && !lastResult.passed) {
+          setResult(lastResult);
+          setSelectedAnswers({});
+        }
+        setNow(Date.now());
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [agentId, item.id, courseId]);
 
   const lockStatus = getLockStatus(lock);
 
@@ -49,7 +101,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
     if (result && !result.passed) {
       setResult(null);
     }
-    if (submitWarning) setSubmitWarning(false);
+    setShowIncompleteHint(false);
 
     const currentSelected = selectedAnswers[questionId] || [];
 
@@ -74,6 +126,11 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
     e.preventDefault();
     if (questions.length === 0) return;
     if (getLockStatus(getQuizUiLock(agentId, item.id)).isLocked) return;
+    if (!allAnswered) {
+      setShowIncompleteHint(true);
+      return;
+    }
+    setShowIncompleteHint(false);
 
     const formattedAnswers = questions.map(q => ({
       question_id: q.id,
@@ -86,9 +143,19 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
       const res = await api.learn.submitQuiz(item.id, courseId, agentId, formattedAnswers);
       setResult(res);
 
+      const scrollToTop = () => {
+        const scrollContainer = document.querySelector('main');
+        if (scrollContainer) {
+          scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      };
+
       if (res.passed) {
         clearQuizUiLock(agentId, item.id);
         setLock(null);
+        scrollToTop();
         if (onQuizPassed) {
           onQuizPassed();
         }
@@ -102,12 +169,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
         setLock(nextLock);
         setNow(Date.now());
         setSelectedAnswers({});
-        const scrollContainer = document.querySelector('main');
-        if (scrollContainer) {
-          scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        scrollToTop();
       }
     } catch (err) {
       setError(err.message || 'Failed to submit assessment.');
@@ -229,10 +291,10 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
           return (
             <div
               key={q.id}
-              className={`py-6 px-0 rounded-lg transition-colors ${
+              className={`py-6 px-4 rounded-lg transition-colors border-l-4 ${
                 wasIncorrect
-                  ? 'bg-watermelon-red-50/50 dark:bg-watermelon-red-950/20'
-                  : 'bg-zinc-50 dark:bg-zinc-950/60'
+                  ? 'bg-watermelon-red-100/80 border-watermelon-red-400 dark:bg-watermelon-red-950/50 dark:border-watermelon-red-500'
+                  : 'bg-zinc-50 border-transparent dark:bg-zinc-950/60'
               }`}
             >
               <div className="flex items-start gap-4 mb-4">
@@ -293,7 +355,6 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
             size="lg"
             className="px-8 py-3 font-black text-base"
             disabled={submitDisabled}
-            onClick={() => { if (!allAnswered && !retakeLocked) setSubmitWarning(true); }}
           >
             {submitting ? (
               'Evaluating Assessment...'
@@ -310,6 +371,32 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
               'Submit Assessment'
             )}
           </Button>
+          {!allAnswered && showIncompleteHint && !retakeLocked && !(result && result.passed) && questions.length > 0 && (
+            <p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500">
+              Answer all {questions.length} questions to enable submit.
+            </p>
+          )}
+          {showAutofill && (
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={handleAutofillCorrect}
+                disabled={submitDisabled}
+                className="text-xs font-mono text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 disabled:opacity-40 underline underline-offset-2 cursor-pointer"
+                title="Testing helper: tick all correct answers"
+              >
+                autofill correct (test)
+              </button>
+              <button
+                type="button"
+                onClick={handleResetTimer}
+                className="text-xs font-mono text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 underline underline-offset-2 cursor-pointer"
+                title="Testing helper: clear the retake cooldown on server and client"
+              >
+                reset timer (test)
+              </button>
+            </div>
+          )}
         </div>
       </form>
     </div>

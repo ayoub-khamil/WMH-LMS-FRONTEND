@@ -163,7 +163,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
             <button
                 key={course.id}
                 onClick={() => handleSelectCourse(course.id)}
-                className="w-full text-left flex items-center justify-between px-5 py-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-watermelon-green-400 dark:hover:border-watermelon-green-600 hover:bg-watermelon-green-50/30 dark:hover:bg-watermelon-green-950/20 transition-all group"
+                className="w-full text-left flex items-center justify-between px-5 py-4 rounded-lg border-2 border-[#4ADE80] bg-white dark:bg-zinc-900 hover:bg-watermelon-green-50/30 dark:hover:bg-watermelon-green-950/20 transition-all group"
               >
                 <div className="flex flex-col gap-0.5 min-w-0">
                   <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">

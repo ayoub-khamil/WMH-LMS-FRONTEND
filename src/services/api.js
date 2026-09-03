@@ -51,6 +51,9 @@ export const api = {
     getCourseTree: (courseId, agentId) => learnApi.getCourseTree(courseId, agentId),
     resumeCourse: (courseId, agentId) => learnApi.resumeCourse(courseId, agentId),
     completeItem: (itemId, courseId, agentId) => learnApi.completeItem(itemId, courseId, agentId),
-    submitQuiz: (itemId, courseId, agentId, answers) => learnApi.submitQuiz(itemId, courseId, agentId, answers)
+    submitQuiz: (itemId, courseId, agentId, answers) => learnApi.submitQuiz(itemId, courseId, agentId, answers),
+    recordView: (agentId, courseId, viewedItemId) => learnApi.recordView(agentId, courseId, viewedItemId),
+    getQuizLock: (agentId, itemId) => learnApi.getQuizLock(agentId, itemId),
+    resetQuizLock: (agentId, itemId) => learnApi.resetQuizLock(agentId, itemId)
   }
 };

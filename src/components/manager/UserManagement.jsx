@@ -281,7 +281,9 @@ export function UserManagement({ onSimulateAgent }) {
                   <td className="py-3.5 px-4">
                     <button
                       onClick={() => handleToggleStatus(u)}
-                      title="Click to toggle active / disabled status"
+                      title={u.is_root ? 'The root account cannot be modified' : 'Click to toggle active / disabled status'}
+                      disabled={u.is_root}
+                      className={u.is_root ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
                     >
                       <Badge variant={u.status === 'active' ? 'active' : 'disabled'} className="w-24 justify-center text-xs tabular-nums">
                         {u.status.toUpperCase()}
@@ -305,15 +307,17 @@ export function UserManagement({ onSimulateAgent }) {
                           setEditPassword('');
                           setShowEditPassword(false);
                         }}
-                        title="Edit User Details"
-                        className="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 rounded border border-transparent hover:border-zinc-200 dark:hover:border-zinc-800"
+                        title={u.is_root ? 'The root account cannot be modified' : 'Edit User Details'}
+                        disabled={u.is_root}
+                        className={`p-1.5 rounded border border-transparent ${u.is_root ? 'text-zinc-300 dark:text-zinc-700 opacity-40 cursor-not-allowed' : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:border-zinc-200 dark:hover:border-zinc-800'}`}
                       >
                         <IconPencil className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => setUserToDelete(u)}
-                        title="Delete User"
-                        className="p-1.5 text-watermelon-red-500 hover:text-watermelon-red-600 rounded border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+                        title={u.is_root ? 'The root account cannot be modified' : 'Delete User'}
+                        disabled={u.is_root}
+                        className={`p-1.5 rounded border border-zinc-200 dark:border-zinc-800 ${u.is_root ? 'text-zinc-300 dark:text-zinc-700 opacity-40 cursor-not-allowed' : 'text-watermelon-red-500 hover:text-watermelon-red-600 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors'}`}
                       >
                         <IconTrash className="w-4 h-4" />
                       </button>
