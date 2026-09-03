@@ -20,9 +20,11 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
     { id: 2, text: '', is_correct: false }
   ]);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const openCreateModal = () => {
     setEditingQuestion(null);
+    setError('');
     setType('multiple_choice');
     setPrompt('');
     setOptions([
@@ -34,6 +36,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
 
   const openEditModal = (question) => {
     setEditingQuestion(question);
+    setError('');
     setType(question.type || 'multiple_choice');
     setPrompt(question.prompt || '');
     setOptions(question.options?.map(o => ({ ...o })) || []);
@@ -91,11 +94,12 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
     // Validation: At least one correct answer
     const hasCorrect = options.some(o => o.is_correct);
     if (!hasCorrect) {
-      alert('Please mark at least one option as the correct answer.');
+      setError('Please mark at least one option as the correct answer.');
       return;
     }
 
     setSaving(true);
+    setError('');
     try {
       if (editingQuestion) {
         await api.courses.updateQuestion(editingQuestion.id, {
@@ -113,7 +117,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
       setIsModalOpen(false);
       onQuestionsUpdated();
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to save question.');
     } finally {
       setSaving(false);
     }
@@ -126,16 +130,22 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
   const handleConfirmDeleteQuestion = async () => {
     if (!questionToDelete) return;
     try {
+      setError('');
       await api.courses.deleteQuestion(questionToDelete);
       setQuestionToDelete(null);
       onQuestionsUpdated();
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to delete question.');
     }
   };
 
   return (
     <div className="space-y-4">
+      {error && (
+        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
+          {error}
+        </div>
+      )}
       <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
           <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">

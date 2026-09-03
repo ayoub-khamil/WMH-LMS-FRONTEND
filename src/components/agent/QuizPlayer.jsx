@@ -20,6 +20,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
   const [submitWarning, setSubmitWarning] = useState(false);
   const [lock, setLock] = useState(() => getQuizUiLock(agentId, item.id));
   const [now, setNow] = useState(Date.now());
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const stored = getQuizUiLock(agentId, item.id);
@@ -80,6 +81,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
     }));
 
     setSubmitting(true);
+    setError('');
     try {
       const res = await api.learn.submitQuiz(item.id, courseId, agentId, formattedAnswers);
       setResult(res);
@@ -108,7 +110,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
         }
       }
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to submit assessment.');
     } finally {
       setSubmitting(false);
     }
@@ -119,6 +121,11 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
 
   return (
     <div className={hideHeader ? 'space-y-8 w-full' : 'bg-white dark:bg-zinc-900 rounded-lg py-10 space-y-8 w-full'}>
+      {error && (
+        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
+          {error}
+        </div>
+      )}
       {/* Quiz Header — only shown when not embedded inside CourseViewer */}
       {!hideHeader && (
         <div className="pb-5 border-b border-zinc-100 dark:border-zinc-800 flex items-start justify-between gap-5">

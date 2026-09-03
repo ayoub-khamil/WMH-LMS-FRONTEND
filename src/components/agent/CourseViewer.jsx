@@ -33,9 +33,11 @@ export function CourseViewer({
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [error, setError] = useState('');
 
   const loadCourseData = async () => {
     setLoading(true);
+    setError('');
     try {
       const tree = await api.learn.getCourseTree(courseId, user.id);
       setCourse(tree);
@@ -58,6 +60,7 @@ export function CourseViewer({
       }
     } catch (err) {
       console.error(err);
+      setError(err.message || 'Failed to load course.');
     } finally {
       setLoading(false);
     }
@@ -105,6 +108,7 @@ export function CourseViewer({
   const handleCompleteAndContinue = async () => {
     if (!currentItem) return;
     setCompleting(true);
+    setError('');
     try {
       const res = await api.learn.completeItem(currentItem.id, course.id, user.id);
       const updatedCompleted = res.completed_item_ids || [...completedItemIds, currentItem.id];
@@ -119,7 +123,7 @@ export function CourseViewer({
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to save progress.');
     } finally {
       setCompleting(false);
     }
@@ -156,6 +160,11 @@ export function CourseViewer({
 
       {/* Main Single-Item Focus Container */}
       <div className="flex-1 max-w-4xl w-full mx-auto px-6 py-10">
+        {error && (
+          <div className="mb-5 p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
+            {error}
+          </div>
+        )}
 
         {/* Navigation Breadcrumb */}
         <div className="mb-5 text-xs tabular-nums font-bold text-zinc-400 flex items-center space-x-2">

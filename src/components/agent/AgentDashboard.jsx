@@ -28,6 +28,8 @@ export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
   const tabFromUrl = searchParams.get('tab');
   const activeTab = DASHBOARD_TABS.includes(tabFromUrl) ? tabFromUrl : 'in_progress';
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
 
   const setActiveTab = (tabId) => {
     const next = new URLSearchParams(searchParams);
@@ -38,11 +40,15 @@ export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
 
   useEffect(() => {
     setLoading(true);
+    setError('');
     api.learn.getCourses(user.id)
       .then(data => setCoursesData(data))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        setError(err.message || 'Failed to load courses.');
+      })
       .finally(() => setLoading(false));
-  }, [user.id, refreshTrigger]);
+  }, [user.id, refreshTrigger, reloadKey]);
 
   const handleDownloadCert = (course) => {
     downloadCertificatePDF({
@@ -134,6 +140,13 @@ export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
       {loading ? (
         <div className="py-28 text-center text-zinc-400 text-base font-medium">
           Loading your training courses…
+        </div>
+      ) : error ? (
+        <div className="py-16 text-center space-y-4">
+          <p className="text-sm font-semibold text-watermelon-red-600 dark:text-watermelon-red-400">{error}</p>
+          <Button variant="secondary" size="md" onClick={() => setReloadKey(k => k + 1)}>
+            Retry
+          </Button>
         </div>
       ) : displayedCourses.length === 0 ? (
         <EmptyState

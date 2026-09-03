@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import { useListQuery } from '../../useListQuery';
-import { useAuth } from '../../context/AuthContext';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 import { Modal } from '../common/Modal';
@@ -10,7 +9,6 @@ import { Select } from '../common/Select';
 import { IconPlus, IconSearch, IconUsers, IconTrash, IconPencil, IconLayers, IconEye, IconEyeSlash } from '../common/Icons';
 
 export function UserManagement({ onSimulateAgent }) {
-  const { switchUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const { search, status: statusFilter, role: roleFilter, page, patch } = useListQuery();
@@ -39,9 +37,11 @@ export function UserManagement({ onSimulateAgent }) {
   const [userAssignmentsModal, setUserAssignmentsModal] = useState(null);
   const [userAssignments, setUserAssignments] = useState([]);
   const [loadingAssignments, setLoadingAssignments] = useState(false);
+  const [error, setError] = useState('');
 
   const fetchUsers = async () => {
     setLoading(true);
+    setError('');
     try {
       const res = await api.users.list({
         role: roleFilter,
@@ -54,6 +54,7 @@ export function UserManagement({ onSimulateAgent }) {
       setTotalPages(res.pagination.totalPages || 1);
     } catch (err) {
       console.error(err);
+      setError(err.message || 'Failed to load users.');
     } finally {
       setLoading(false);
     }
@@ -83,6 +84,7 @@ export function UserManagement({ onSimulateAgent }) {
     e.preventDefault();
     if (!firstName.trim() || !lastName.trim() || !email.trim()) return;
     setSubmitting(true);
+    setError('');
     try {
       await api.users.create({
         first_name: firstName.trim(),
@@ -101,7 +103,7 @@ export function UserManagement({ onSimulateAgent }) {
       setEmailManuallyEdited(false);
       await fetchUsers();
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to create user.');
     } finally {
       setSubmitting(false);
     }
@@ -111,6 +113,7 @@ export function UserManagement({ onSimulateAgent }) {
     e.preventDefault();
     if (!editingUser) return;
     setSubmitting(true);
+    setError('');
     try {
       const payload = {
         first_name: editingUser.first_name,
@@ -127,7 +130,7 @@ export function UserManagement({ onSimulateAgent }) {
       setShowEditPassword(false);
       await fetchUsers();
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to update user.');
     } finally {
       setSubmitting(false);
     }
@@ -136,21 +139,23 @@ export function UserManagement({ onSimulateAgent }) {
   const handleToggleStatus = async (user) => {
     const newStatus = user.status === 'active' ? 'disabled' : 'active';
     try {
+      setError('');
       await api.users.updateStatus(user.id, newStatus);
       await fetchUsers();
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to update status.');
     }
   };
 
   const handleDeleteUser = async () => {
     if (!userToDelete) return;
     try {
+      setError('');
       await api.users.delete(userToDelete.id);
       setUserToDelete(null);
       await fetchUsers();
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to delete user.');
     }
   };
 
@@ -169,6 +174,11 @@ export function UserManagement({ onSimulateAgent }) {
 
   return (
     <div className="space-y-8">
+      {error && (
+        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
+          {error}
+        </div>
+      )}
       {/* Top Filter Bar */}
       <div className="flex flex-col sm:flex-row items-start justify-between gap-5">
         <div className="flex items-start space-x-3 w-full sm:w-auto flex-wrap sm:flex-nowrap">
@@ -500,15 +510,7 @@ export function UserManagement({ onSimulateAgent }) {
             />
           </div>
 
-          {/* Current Password Display */}
-          <div>
-            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1.5">
-              Current Password
-            </label>
-            <div className="px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 font-sans font-medium">
-              {editingUser?.password || (editingUser?.role === 'manager' ? 'manager2026' : 'agent2026')}
-            </div>
-          </div>
+          {/* Passwords are never returned by the API and cannot be displayed. */}
 
           {/* Change Password Input */}
           <div>

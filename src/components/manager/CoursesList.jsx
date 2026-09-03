@@ -20,9 +20,11 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
   const [createSubmitting, setCreateSubmitting] = useState(false);
 
   const [courseToDelete, setCourseToDelete] = useState(null);
+  const [error, setError] = useState('');
 
   const fetchCourses = async () => {
     setLoading(true);
+    setError('');
     try {
       const res = await api.courses.list({
         status: statusFilter,
@@ -34,6 +36,7 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
       setTotalPages(res.pagination.totalPages || 1);
     } catch (err) {
       console.error(err);
+      setError(err.message || 'Failed to load courses.');
     } finally {
       setLoading(false);
     }
@@ -58,7 +61,7 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
       await fetchCourses();
       onSelectCourse(created.id);
     } catch (err) {
-      alert(err.message);
+      setError(err.message);
     } finally {
       setCreateSubmitting(false);
     }
@@ -71,12 +74,17 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
       setCourseToDelete(null);
       await fetchCourses();
     } catch (err) {
-      alert(err.message);
+      setError(err.message);
     }
   };
 
   return (
     <div className="space-y-8">
+      {error && (
+        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
+          {error}
+        </div>
+      )}
       {/* Action Bar */}
       <div className="flex flex-col sm:flex-row items-start justify-between gap-5">
         <div className="flex items-start space-x-3 w-full sm:w-auto">

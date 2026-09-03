@@ -228,9 +228,17 @@ function AppLayout() {
 }
 
 function AppContent() {
-  const { user } = useAuth();
+  const { user, authLoading } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-zinc-50/70 dark:bg-zinc-950 text-zinc-400 text-base font-medium">
+        Restoring session…
+      </div>
+    );
+  }
 
   if (!user) {
     return (

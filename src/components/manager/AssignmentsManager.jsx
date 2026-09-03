@@ -23,13 +23,14 @@ export function AssignmentsManager({ initialCourseId = null }) {
   const [agentSearch, setAgentSearch] = useState('');
 
   const [agentToUnassign, setAgentToUnassign] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const init = async () => {
       setLoading(true);
       try {
-        const coursesRes = await api.courses.list({ limit: 100 });
-        setCourses(coursesRes.data.filter(c => c.status === 'published'));
+        const coursesRes = await api.courses.list({ status: 'published', limit: 100 });
+        setCourses(coursesRes.data.filter(c => c.status === 'published' || !c.status));
 
         const usersRes = await api.users.list({ role: 'agent', status: 'active', limit: 100 });
         setAllAgents(usersRes.data);
@@ -44,6 +45,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
         }
       } catch (err) {
         console.error(err);
+        setError(err.message || 'Failed to load assignments.');
       } finally {
         setLoading(false);
       }
@@ -67,6 +69,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
   const handleConfirmUnassign = async () => {
     if (!agentToUnassign) return;
     try {
+      setError('');
       await api.assignments.unassignBulk({
         course_id: selectedCourseId,
         agent_ids: [agentToUnassign.agent_id]
@@ -75,7 +78,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
       const cohortRes = await api.assignments.getCourseAssignments(selectedCourseId);
       setAssignments(cohortRes);
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to unassign agent.');
     }
   };
 
@@ -100,6 +103,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
     e.preventDefault();
     if (selectedAgentIds.length === 0 || !selectedCourseId) return;
     setAssigning(true);
+    setError('');
     try {
       await api.assignments.assignBulk({
         course_id: selectedCourseId,
@@ -110,7 +114,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
       const cohortRes = await api.assignments.getCourseAssignments(selectedCourseId);
       setAssignments(cohortRes);
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to enroll agents.');
     } finally {
       setAssigning(false);
     }
@@ -127,6 +131,11 @@ export function AssignmentsManager({ initialCourseId = null }) {
   if (!selectedCourseId) {
     return (
       <div className="space-y-8">
+        {error && (
+          <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
+            {error}
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row items-start justify-between gap-5 pb-4 border-b border-zinc-200 dark:border-zinc-800">
           <div>
             <h2 className="text-lg font-black text-zinc-900 dark:text-zinc-100">
@@ -179,6 +188,11 @@ export function AssignmentsManager({ initialCourseId = null }) {
 
   return (
     <div className="space-y-8">
+      {error && (
+        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
+          {error}
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row items-start justify-between gap-5 pb-4 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-3 min-w-0">
           <button

@@ -13,6 +13,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
   const [textContent, setTextContent] = useState(item.text_content || '');
   const [questions, setQuestions] = useState(item.questions || []);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   // Helper to extract YouTube embed URL
   const getYouTubeEmbedUrl = (url) => {
@@ -29,7 +30,8 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
 
   const refreshQuestions = async () => {
     try {
-      const course = await api.courses.getById(item.course_id || 101);
+      if (!item.course_id) return;
+      const course = await api.courses.getById(item.course_id);
       for (const s of course.sections || []) {
         const found = (s.items || []).find(i => i.id === item.id);
         if (found) {
@@ -46,6 +48,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
     e.preventDefault();
     if (!title.trim()) return;
     setSaving(true);
+    setError('');
     try {
       await api.courses.updateItem(item.id, {
         title: title.trim(),
@@ -55,7 +58,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
       });
       onSaveSuccess();
     } catch (err) {
-      alert(err.message);
+      setError(err.message || 'Failed to save item.');
     } finally {
       setSaving(false);
     }
@@ -63,6 +66,11 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
 
   return (
     <div className="space-y-8">
+      {error && (
+        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
+          {error}
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center space-x-3">
