@@ -62,18 +62,6 @@ html.dark main.course-scroll::-webkit-scrollbar-button:single-button:vertical:in
   border-color: #3F3F46 transparent transparent transparent;
 }
 
-/* Watermelon Dual-Tone Top Ribbon */
-.watermelon-top-ribbon {
-  height: 5px;
-  width: 100%;
-  background: linear-gradient(90deg, #4ade80 0%, #22c55e 48%, #fb7185 52%, #f43f5e 100%);
-}
-
-/* Open, Spacious Card style with minimal borders */
-.spacious-card {
-  @apply bg-white dark:bg-zinc-900 rounded-lg p-7;
-}
-
 .flat-card {
   @apply bg-white dark:bg-zinc-900 rounded-lg;
 }

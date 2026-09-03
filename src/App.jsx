@@ -98,9 +98,8 @@ function ManagerAssignmentsPage() {
 }
 
 function ManagerUsersPage() {
-  const navigate = useNavigate();
   return (
-    <UserManagement onSimulateAgent={() => navigate(paths.learn)} />
+    <UserManagement />
   );
 }
 
@@ -162,7 +161,6 @@ function AppLayout() {
             onViewChange={(view) => {
               if (view === 'agent_dashboard') navigate(paths.learn);
               else if (view === 'manager_courses') navigate(paths.managerCourses);
-              else if (view === 'manager_assignments') navigate(paths.managerAssignments);
               else if (view === 'manager_users') navigate(paths.managerUsers);
               else if (view === 'agent_course_viewer' && selectedCourseId) {
                 navigate(selectedItemId
@@ -283,10 +281,6 @@ function AppContent() {
         />
         <Route
           path="/manager/courses/:courseId/assignments"
-          element={<ManagerOnly><ManagerAssignmentsPage /></ManagerOnly>}
-        />
-        <Route
-          path="/manager/assignments"
           element={<ManagerOnly><ManagerAssignmentsPage /></ManagerOnly>}
         />
         <Route

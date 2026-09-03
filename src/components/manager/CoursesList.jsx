@@ -184,6 +184,12 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
                     <span>{sectionsCount} {sectionsCount === 1 ? 'Section' : 'Sections'}</span>
                     <span>•</span>
                     <span>{itemsCount} {itemsCount === 1 ? 'Item' : 'Items'}</span>
+                    {course.created_at && (
+                      <>
+                        <span>•</span>
+                        <span>Created {new Date(course.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      </>
+                    )}
                   </div>
                 </div>
 

@@ -6,7 +6,7 @@ import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 import { Modal } from '../common/Modal';
 import { EmptyState } from '../common/EmptyState';
-import { IconLayers, IconPlus, IconTrash, IconSearch, IconCheck, IconChevronDown, IconClock, IconArrowLeftSmall } from '../common/Icons';
+import { IconLayers, IconPlus, IconTrash, IconSearch, IconCheck, IconClock, IconArrowLeftSmall } from '../common/Icons';
 
 export function AssignmentsManager({ initialCourseId = null }) {
   const navigate = useNavigate();
@@ -14,7 +14,6 @@ export function AssignmentsManager({ initialCourseId = null }) {
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [assignments, setAssignments] = useState([]);
   const [allAgents, setAllAgents] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -27,7 +26,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
 
   useEffect(() => {
     const init = async () => {
-      setLoading(true);
+      setLoadingDetail(true);
       try {
         const coursesRes = await api.courses.list({ status: 'published', limit: 100 });
         setCourses(coursesRes.data.filter(c => c.status === 'published' || !c.status));
@@ -47,18 +46,14 @@ export function AssignmentsManager({ initialCourseId = null }) {
         console.error(err);
         setError(err.message || 'Failed to load assignments.');
       } finally {
-        setLoading(false);
+        setLoadingDetail(false);
       }
     };
     init();
   }, [initialCourseId]);
 
-  const handleSelectCourse = (courseId) => {
-    navigate(paths.managerCourseAssignments(courseId));
-  };
-
   const handleBack = () => {
-    navigate(paths.managerAssignments);
+    navigate(paths.managerCourses);
   };
 
   const handleUnassignAgent = (agentId) => {
@@ -128,64 +123,6 @@ export function AssignmentsManager({ initialCourseId = null }) {
     a.email.toLowerCase().includes(agentSearch.toLowerCase())
   );
 
-  if (!selectedCourseId) {
-    return (
-      <div className="space-y-8">
-        {error && (
-          <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
-            {error}
-          </div>
-        )}
-        <div className="flex flex-col sm:flex-row items-start justify-between gap-5 pb-4 border-b border-zinc-200 dark:border-zinc-800">
-          <div>
-            <h2 className="text-lg font-black text-zinc-900 dark:text-zinc-100">
-              Course Assignments
-            </h2>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-              Click a course below to view its enrollments and progress stats.
-            </p>
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="py-24 text-center text-zinc-400 text-base font-medium">
-            Loading courses...
-          </div>
-        ) : courses.length === 0 ? (
-          <EmptyState
-            icon={IconLayers}
-            title="No published courses"
-            description="Publish a course in the Course Catalog tab before managing enrollments here."
-          />
-        ) : (
-          <div className="space-y-2">
-            {courses.map((course) => (
-            <button
-                key={course.id}
-                onClick={() => handleSelectCourse(course.id)}
-                className="w-full text-left flex items-center justify-between px-5 py-4 rounded-lg border-2 border-[#4ADE80] bg-white dark:bg-zinc-900 hover:bg-watermelon-green-50/30 dark:hover:bg-watermelon-green-950/20 transition-all group"
-              >
-                <div className="flex flex-col gap-0.5 min-w-0">
-                  <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
-                    {course.title}
-                  </span>
-                  {course.description && (
-                    <span className="text-xs text-zinc-500 dark:text-zinc-400 truncate max-w-xl">
-                      {course.description}
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-                  <IconChevronDown className="w-4 h-4 -rotate-90 text-zinc-400 group-hover:text-watermelon-green-500 transition-colors" />
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8">
       {error && (
@@ -200,7 +137,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
             className="flex items-center gap-1.5 text-xs font-bold text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 uppercase tracking-wider transition-colors flex-shrink-0"
           >
             <IconArrowLeftSmall className="w-4 h-4" />
-            All Courses
+            Catalog
           </button>
           <span className="text-zinc-300 dark:text-zinc-700 flex-shrink-0">/</span>
           <h2 className="text-lg font-black text-zinc-900 dark:text-zinc-100 truncate">
@@ -306,6 +243,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
                 <th className="py-3.5 px-4">Email</th>
                 <th className="py-3.5 px-4">Status</th>
                 <th className="py-3.5 px-4">Progress</th>
+                <th className="py-3.5 px-4">Enrolled</th>
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -334,10 +272,18 @@ export function AssignmentsManager({ initialCourseId = null }) {
                           style={{ width: `${assignment.progress}%` }}
                         />
                       </div>
-                      <span className="text-xs tabular-nums font-bold text-watermelon-green-700 dark:text-watermelon-green-300">
-                        {assignment.progress}%
+                      <span className="text-xs tabular-nums font-bold text-watermelon-green-700 dark:text-watermelon-green-300 whitespace-nowrap">
+                        {assignment.progress}% · {assignment.completed_items_count || 0} of {assignment.total_items || 0}
                       </span>
                     </div>
+                  </td>
+                  <td className="py-3.5 px-4 text-xs text-zinc-500 dark:text-zinc-400 font-medium whitespace-nowrap">
+                    {assignment.assigned_at
+                      ? new Date(assignment.assigned_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                      : '—'}
+                    {assignment.completed_at && (
+                      <> → {new Date(assignment.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</>
+                    )}
                   </td>
                   <td className="py-3.5 px-4 text-right">
                     <button

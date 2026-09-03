@@ -181,17 +181,9 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
                 rows={12}
                 value={textContent}
                 onChange={(e) => setTextContent(e.target.value)}
-                placeholder="Paste or type text content here (copied from Word, PDF, or typed directly). Newlines, paragraphs, and lists are preserved exactly as written."
+                placeholder="Paste or type plain text here. What you type is exactly what agents see."
                 className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-sans leading-relaxed whitespace-pre-wrap font-medium"
               />
-              <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800">
-                <span className="text-xs font-medium text-zinc-500 uppercase">Live Render Preview</span>
-                <div 
-                  className="mt-2 p-4 border border-zinc-200 dark:border-zinc-800 rounded bg-zinc-50 dark:bg-zinc-900/30 text-sm text-zinc-800 dark:text-zinc-200 max-w-none whitespace-pre-wrap leading-relaxed"
-                >
-                  {textContent || <span className="text-zinc-400 italic">No content provided.</span>}
-                </div>
-              </div>
             </div>
           )}
 

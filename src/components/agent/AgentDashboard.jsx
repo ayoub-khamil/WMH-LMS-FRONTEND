@@ -157,8 +157,9 @@ export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
       ) : (
         <div className="space-y-4">
           {displayedCourses.map((course) => {
-            const isDone     = course.status === 'completed' || course.progress === 100;
-            const notStarted = course.status === 'not_started' || (course.completed_item_ids?.length || 0) === 0;
+            const state = course.assignment_status || course.status;
+            const isDone     = state === 'completed' || course.progress === 100;
+            const notStarted = state === 'not_started' || (course.completed_item_ids?.length || 0) === 0;
             const pct        = course.progress || 0;
             const completed  = course.completed_item_ids?.length || 0;
             const total      = course.total_items || 0;
@@ -193,6 +194,17 @@ export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
                       <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed line-clamp-2">
                         {course.description}
                       </p>
+                      {(course.assigned_at || (isDone && course.completed_at)) && (
+                        <p className="text-xs text-zinc-400 dark:text-zinc-500 font-medium">
+                          {course.assigned_at && (
+                            <>Assigned {new Date(course.assigned_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</>
+                          )}
+                          {course.assigned_at && isDone && course.completed_at && <> · </>}
+                          {isDone && course.completed_at && (
+                            <>Completed {new Date(course.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</>
+                          )}
+                        </p>
+                      )}
                     </div>
 
                     {/* COLUMN 2: Progress Gauge (Span 3) */}
@@ -203,12 +215,22 @@ export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
                           {pct}%
                         </span>
                       </div>
-                      <div className="h-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                      <div
+                        className="h-2.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden"
+                        role="progressbar"
+                        aria-label={`${course.title} progress`}
+                        aria-valuenow={pct}
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                      >
                         <div
                           className="h-full bg-watermelon-green-500 transition-all duration-500"
                           style={{ width: `${pct}%` }}
                         />
                       </div>
+                      <p className="text-xs tabular-nums text-zinc-400 dark:text-zinc-500 font-medium">
+                        {completed} of {total} modules
+                      </p>
                     </div>
 
                     {/* COLUMN 3: Actions (Span 3) - Centered */}

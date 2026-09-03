@@ -9,7 +9,6 @@ export const paths = {
   managerCourses: '/manager/courses',
   managerEditor: (courseId) => `/manager/courses/${courseId}`,
   managerEditorItem: (courseId, itemId) => `/manager/courses/${courseId}/items/${itemId}`,
-  managerAssignments: '/manager/assignments',
   managerCourseAssignments: (courseId) => `/manager/courses/${courseId}/assignments`,
   managerUsers: '/manager/users',
 };

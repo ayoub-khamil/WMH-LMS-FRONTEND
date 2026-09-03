@@ -8,7 +8,7 @@ import { EmptyState } from '../common/EmptyState';
 import { Select } from '../common/Select';
 import { IconPlus, IconSearch, IconUsers, IconTrash, IconPencil, IconLayers, IconEye, IconEyeSlash } from '../common/Icons';
 
-export function UserManagement({ onSimulateAgent }) {
+export function UserManagement() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const { search, status: statusFilter, role: roleFilter, page, patch } = useListQuery();
@@ -253,13 +253,14 @@ export function UserManagement({ onSimulateAgent }) {
         <div className="flat-card overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-zinc-50 dark:bg-zinc-900/70 border-b border-zinc-200 dark:border-zinc-800 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
-                <th className="py-3 px-4">User</th>
-                <th className="py-3 px-4">Email</th>
-                <th className="py-3 px-4">Role</th>
-                <th className="py-3 px-4">Status</th>
-                <th className="py-3 px-4 text-right">Actions</th>
-              </tr>
+                <tr className="bg-zinc-50 dark:bg-zinc-900/70 border-b border-zinc-200 dark:border-zinc-800 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+                  <th className="py-3 px-4">User</th>
+                  <th className="py-3 px-4">Email</th>
+                  <th className="py-3 px-4">Role</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4">Joined</th>
+                  <th className="py-3 px-4 text-right">Actions</th>
+                </tr>
             </thead>
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-sm">
               {users.map((u) => (
@@ -289,6 +290,11 @@ export function UserManagement({ onSimulateAgent }) {
                         {u.status.toUpperCase()}
                       </Badge>
                     </button>
+                  </td>
+                  <td className="py-3.5 px-4 text-zinc-500 dark:text-zinc-400 text-xs font-medium whitespace-nowrap">
+                    {u.created_at
+                      ? new Date(u.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                      : '—'}
                   </td>
                   <td className="py-3.5 px-4 text-right">
                     <div className="flex items-center justify-end space-x-1">

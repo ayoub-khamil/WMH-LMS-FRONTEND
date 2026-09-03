@@ -7,7 +7,6 @@ import darkLogoSrc from '/assets/darkModeLogo.png';
 import {
   IconBook,
   IconUsers,
-  IconLayers,
   IconAcademicCap,
   IconVideo,
   IconDocumentText,
@@ -254,8 +253,6 @@ export function Sidebar({
             ) : (
               activeCourseTree.sections.map((sec, secIdx) => {
                 const secItems    = sec.items || [];
-                const secDone     = secItems.filter(i => completedIds.includes(i.id)).length;
-                const isSecDone   = secItems.length > 0 && secDone === secItems.length;
 
                 return (
                   <div key={sec.id}>
@@ -366,7 +363,6 @@ export function Sidebar({
         <nav className="p-5 space-y-2 flex-1">
           {[
             { id: 'manager_courses',     label: 'Course Catalog & Tree',   icon: IconBook    },
-            { id: 'manager_assignments', label: 'Course Assignments',     icon: IconLayers  },
             { id: 'manager_users',       label: 'Agent & User Roster',      icon: IconUsers   },
           ].map(item => {
             const Icon = item.icon;
