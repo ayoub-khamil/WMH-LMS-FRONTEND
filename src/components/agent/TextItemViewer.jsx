@@ -2,7 +2,7 @@ import React from 'react';
 
 export function TextItemViewer({ content, title, hideHeader = false }) {
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-lg py-10 space-y-8 w-full">
+    <div className="bg-[#F7F8ED] dark:bg-zinc-900 rounded-lg py-10 space-y-8 w-full">
       {!hideHeader && (
         <div className="pb-5 border-b border-zinc-100 dark:border-zinc-800">
           <span className="text-xs tabular-nums font-black text-watermelon-green-600 dark:text-watermelon-green-400 uppercase tracking-wider">

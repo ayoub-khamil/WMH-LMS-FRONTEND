@@ -337,7 +337,7 @@ export function CourseEditor({
                 className="border-2 border-wmh-green rounded-lg overflow-hidden"
               >
                 {/* Section Header */}
-                <div className="px-5 py-3.5 bg-zinc-50 dark:bg-zinc-900/60 border-b border-wmh-green flex items-center justify-between"
+                <div className="px-5 py-3.5 bg-[#F7F8ED] dark:bg-zinc-900/60 border-b border-wmh-green flex items-center justify-between"
                 >
                   <div className="flex items-center space-x-3">
                     <span className="text-xs font-mono font-bold text-zinc-400">
@@ -381,7 +381,7 @@ export function CourseEditor({
                     <button
                       onClick={() => handleDeleteSection(section.id)}
                       title="Delete Section"
-                      className="p-1.5 text-rose-500 hover:text-rose-600 rounded border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+                      className="p-1.5 text-rose-500 hover:text-rose-600 rounded border border-zinc-200 dark:border-zinc-700 hover:bg-[#F7F8ED] dark:hover:bg-zinc-900 transition-colors"
                     >
                       <IconTrash className="w-3.5 h-3.5" />
                     </button>
@@ -416,10 +416,10 @@ export function CourseEditor({
                         return (
                           <div
                             key={item.id}
-                            className="p-3 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md flex items-center justify-between hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
+                            className="p-3 bg-[#F7F8ED] dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md flex items-center justify-between hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
                           >
                             <div className="flex items-center space-x-3 min-w-0">
-                              <div className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex-shrink-0">
+                              <div className="p-1.5 rounded border border-zinc-200 dark:border-zinc-800 bg-[#F7F8ED] dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 flex-shrink-0">
                                 <ItemIcon className="w-4 h-4" />
                               </div>
                               <div className="flex flex-col min-w-0">
@@ -468,7 +468,7 @@ export function CourseEditor({
                               <button
                                 onClick={() => handleDeleteItem(item.id)}
                                 title="Delete Item"
-                                className="p-1.5 text-rose-500 hover:text-rose-600 rounded border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+                                className="p-1.5 text-rose-500 hover:text-rose-600 rounded border border-zinc-200 dark:border-zinc-700 hover:bg-[#F7F8ED] dark:hover:bg-zinc-900 transition-colors"
                               >
                                 <IconTrash className="w-3.5 h-3.5" />
                               </button>
@@ -502,7 +502,7 @@ export function CourseEditor({
               placeholder="e.g. Module 2: Escalation & Compliance"
               value={newSectionTitle}
               onChange={(e) => setNewSectionTitle(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+              className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
             />
           </div>
           <div className="flex justify-end space-x-3 pt-3">
@@ -532,7 +532,7 @@ export function CourseEditor({
               required
               value={editingSection?.title || ''}
               onChange={(e) => setEditingSection(prev => ({ ...prev, title: e.target.value }))}
-              className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+              className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
             />
           </div>
           <div className="flex justify-end space-x-3 pt-3">
@@ -563,7 +563,7 @@ export function CourseEditor({
               placeholder="e.g. Call Etiquette Video Demonstration"
               value={newItemTitle}
               onChange={(e) => setNewItemTitle(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+              className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
             />
           </div>
 
@@ -594,7 +594,7 @@ export function CourseEditor({
                 placeholder="https://www.youtube.com/watch?v=..."
                 value={newItemUrl}
                 onChange={(e) => setNewItemUrl(e.target.value)}
-                className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+                className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
               />
             </div>
           )}

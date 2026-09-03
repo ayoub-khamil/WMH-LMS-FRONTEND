@@ -105,7 +105,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+                className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
               />
             </div>
 
@@ -137,7 +137,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
                   placeholder="https://www.youtube.com/watch?v=..."
                   value={contentUrl}
                   onChange={(e) => setContentUrl(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+                  className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
                 />
                 <p className="text-[11px] text-zinc-400 mt-1">
                   Supports standard and unlisted YouTube links.
@@ -165,7 +165,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
                   />
                 </div>
               ) : (
-                <div className="aspect-video flex items-center justify-center border border-dashed border-zinc-300 dark:border-zinc-700 rounded bg-zinc-50 dark:bg-zinc-900/50 text-xs text-zinc-400">
+                <div className="aspect-video flex items-center justify-center border border-dashed border-zinc-300 dark:border-zinc-700 rounded bg-[#F7F8ED] dark:bg-zinc-900/50 text-xs text-zinc-400">
                   Enter a valid YouTube URL on the left to preview the video player embed.
                 </div>
               )}
@@ -182,7 +182,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
                 value={textContent}
                 onChange={(e) => setTextContent(e.target.value)}
                 placeholder="Paste or type plain text here. What you type is exactly what agents see."
-                className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-sans leading-relaxed whitespace-pre-wrap font-medium"
+                className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-sans leading-relaxed whitespace-pre-wrap font-medium"
               />
             </div>
           )}
@@ -212,7 +212,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
                   />
                 </div>
               ) : (
-                <div className="h-32 flex items-center justify-center border border-dashed border-zinc-300 dark:border-zinc-700 rounded bg-zinc-50 dark:bg-zinc-900/50 text-xs text-zinc-400">
+                <div className="h-32 flex items-center justify-center border border-dashed border-zinc-300 dark:border-zinc-700 rounded bg-[#F7F8ED] dark:bg-zinc-900/50 text-xs text-zinc-400">
                   Enter an audio stream URL to preview.
                 </div>
               )}

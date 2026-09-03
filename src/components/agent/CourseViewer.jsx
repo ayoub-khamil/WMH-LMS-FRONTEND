@@ -250,7 +250,7 @@ export function CourseViewer({
         )}
 
         {currentItem?.type === 'audio' && (
-          <div className="bg-white dark:bg-zinc-900 rounded-lg p-10">
+          <div className="bg-[#F7F8ED] dark:bg-zinc-900 rounded-lg p-10">
             <YouTubePlayer
               url={currentItem.content_url}
               title={currentItem.title}

@@ -30,7 +30,7 @@ export function CourseCompleteModal({ isOpen, onClose, course, agentName, onRetu
           <p className="text-xs text-zinc-500 max-w-sm mx-auto">
             You have successfully completed the course:
           </p>
-          <div className="p-3 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md text-sm font-bold text-zinc-900 dark:text-zinc-100 mt-2">
+          <div className="p-3 bg-[#F7F8ED] dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md text-sm font-bold text-zinc-900 dark:text-zinc-100 mt-2">
             {course.title}
           </div>
         </div>

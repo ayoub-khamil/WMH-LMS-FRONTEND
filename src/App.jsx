@@ -140,19 +140,19 @@ function AppLayout() {
         };
       case 'manager_users':
         return {
-          title: 'Agent & User Directory',
+          title: 'Agent & User Roster',
           breadcrumbs: [{ label: 'Manager Console' }, { label: 'Users' }]
         };
       default:
         return {
-          title: 'Course Catalog & Curriculum Management',
+          title: 'Course Catalog & Tree',
           breadcrumbs: [{ label: 'Manager Console' }, { label: 'Courses' }]
         };
     }
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-zinc-50/70 dark:bg-zinc-950">
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#F7F8ED]/70 dark:bg-zinc-950">
 
       <div className="flex-1 flex overflow-hidden">
         {showSidebar && (
@@ -194,7 +194,7 @@ function AppLayout() {
                   onClick={() => {
                     logout();
                   }}
-                  className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm font-bold text-zinc-600 dark:text-zinc-300 hover:text-watermelon-red-600 dark:hover:text-watermelon-red-400 hover:border-watermelon-red-200 dark:hover:border-watermelon-red-900/60 transition-colors cursor-pointer shadow-sm flex-shrink-0"
+                  className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#F7F8ED] dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm font-bold text-zinc-600 dark:text-zinc-300 hover:text-watermelon-red-600 dark:hover:text-watermelon-red-400 hover:border-watermelon-red-200 dark:hover:border-watermelon-red-900/60 transition-colors cursor-pointer shadow-sm flex-shrink-0"
                   title="Sign Out"
                 >
                   <IconLogout className="w-4 h-4" />
@@ -204,7 +204,7 @@ function AppLayout() {
                 <button
                   onClick={toggleTheme}
                   aria-label="Toggle Theme"
-                  className="p-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer shadow-sm flex-shrink-0"
+                  className="p-1.5 rounded-full bg-[#F7F8ED] dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer shadow-sm flex-shrink-0"
                   title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
                 >
                   {theme === 'dark' ? <IconSun className="w-4 h-4" /> : <IconMoon className="w-4 h-4" />}
@@ -243,7 +243,7 @@ function AppContent() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-zinc-50/70 dark:bg-zinc-950 text-zinc-400 text-base font-medium">
+      <div className="min-h-screen w-full flex items-center justify-center bg-[#F7F8ED]/70 dark:bg-zinc-950 text-zinc-400 text-base font-medium">
         Restoring session…
       </div>
     );

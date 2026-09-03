@@ -178,7 +178,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
           {questions.map((q, idx) => (
             <div
               key={q.id}
-              className="p-4 rounded-md border border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 flex flex-col space-y-2"
+              className="p-4 rounded-md border border-zinc-200 dark:border-zinc-800 bg-[#F7F8ED]/50 dark:bg-zinc-900/40 flex flex-col space-y-2"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
@@ -271,7 +271,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
               placeholder="e.g. Which of the following customer actions requires an instant Tier 2 escalation?"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+              className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
             />
           </div>
 
@@ -301,7 +301,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
                     className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center border transition-colors ${
                       opt.is_correct
                         ? 'bg-emerald-400 border-emerald-500 text-zinc-950 font-bold'
-                        : 'border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-transparent'
+                        : 'border-zinc-300 dark:border-zinc-700 bg-[#F7F8ED] dark:bg-zinc-800 text-transparent'
                     }`}
                   >
                     <IconCheck className="w-3.5 h-3.5" />
@@ -314,7 +314,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
                     placeholder={`Option ${idx + 1}`}
                     value={opt.text}
                     onChange={(e) => handleOptionTextChange(idx, e.target.value)}
-                    className="flex-1 px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium disabled:opacity-60"
+                    className="flex-1 px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium disabled:opacity-60"
                   />
 
                   {type !== 'true_false' && options.length > 2 && (

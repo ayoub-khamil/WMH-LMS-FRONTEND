@@ -27,7 +27,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'max-w-md' 
       />
       
       {/* Modal Dialog */}
-      <div className={`relative w-full ${maxWidth} bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md p-6 z-10 max-h-[90vh] overflow-y-auto`}>
+      <div className={`relative w-full ${maxWidth} bg-[#F7F8ED] dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-md p-6 z-10 max-h-[90vh] overflow-y-auto`}>
         <div className="flex items-center justify-between pb-4 mb-4 border-b border-zinc-200 dark:border-zinc-800">
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             {title}

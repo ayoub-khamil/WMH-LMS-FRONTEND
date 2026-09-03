@@ -35,7 +35,7 @@ export function Button({
     dark: 'bg-zinc-900 hover:bg-zinc-800 text-white border-zinc-900 dark:bg-zinc-100 dark:hover:bg-zinc-200 dark:text-zinc-950 dark:border-zinc-100',
     
     // Flat Outline Monochrome with enhanced surface contrast
-    secondary: 'bg-zinc-50 hover:bg-zinc-100 text-zinc-900 border-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-100 dark:border-zinc-700',
+    secondary: 'bg-[#F7F8ED] hover:bg-zinc-100 text-zinc-900 border-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:text-zinc-100 dark:border-zinc-700',
     
     // Ghost
     ghost: 'bg-transparent hover:bg-zinc-100 text-zinc-700 border-transparent dark:text-zinc-300 dark:hover:bg-zinc-800',

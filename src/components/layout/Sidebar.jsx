@@ -61,13 +61,13 @@ function CheckCircle({ done, active }) {
   }
   if (active) {
     return (
-      <span className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-watermelon-green-500 bg-white dark:bg-zinc-900 flex items-center justify-center">
+      <span className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-watermelon-green-500 bg-[#F7F8ED] dark:bg-zinc-900 flex items-center justify-center">
         <span className="w-2 h-2 rounded-full bg-watermelon-green-500" />
       </span>
     );
   }
   return (
-    <span className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900" />
+    <span className="flex-shrink-0 w-6 h-6 rounded-full border-2 border-zinc-300 dark:border-zinc-600 bg-[#F7F8ED] dark:bg-zinc-900" />
   );
 }
 
@@ -182,7 +182,7 @@ export function Sidebar({
   return (
     <aside
       style={{ width: `${sidebarWidth}px` }}
-      className="relative flex-shrink-0 flex flex-col h-full bg-white dark:bg-zinc-950 border-r border-zinc-200/70 dark:border-zinc-800/70 select-none overflow-hidden"
+      className="relative flex-shrink-0 flex flex-col h-full bg-[#F7F8ED] dark:bg-zinc-950 border-r border-zinc-200/70 dark:border-zinc-800/70 select-none overflow-hidden"
     >
       {/* ── Draggable Right Resize Handle ───────────────────────── */}
       <div
@@ -197,7 +197,7 @@ export function Sidebar({
       </div>
 
       {/* ── Brand Header with Logo on Left, Back Button on Opposite (Right) Side ──────────────── */}
-      <div className="h-20 flex items-center justify-between gap-3 px-4 border-b border-zinc-100 dark:border-zinc-900 bg-white dark:bg-zinc-950 flex-shrink-0">
+      <div className="h-20 flex items-center justify-between gap-3 px-4 border-b border-zinc-100 dark:border-zinc-900 bg-[#F7F8ED] dark:bg-zinc-950 flex-shrink-0">
         <img
           src={theme === 'dark' ? darkLogoSrc : lightLogoSrc}
           alt="WatermelonHub"
@@ -223,7 +223,7 @@ export function Sidebar({
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
 
           {/* Course title + progress (like the reference image) */}
-          <div className="px-5 pt-5 pb-4 bg-zinc-50/60 dark:bg-zinc-900/40 flex-shrink-0">
+          <div className="px-5 pt-5 pb-4 bg-[#F7F8ED]/60 dark:bg-zinc-900/40 flex-shrink-0">
             {/* Course Title with word wrap */}
             <h3 className="text-base font-black text-zinc-900 dark:text-zinc-100 leading-snug break-words whitespace-normal mb-3">
               {activeCourseTree?.title || agentCourses.find(c => c.id === activeCourseId)?.title || 'Course Curriculum'}
@@ -284,7 +284,7 @@ export function Sidebar({
                                 ? 'opacity-50'
                                 : isSelected
                                 ? 'bg-watermelon-green-50 dark:bg-watermelon-green-950/40'
-                                : 'hover:bg-zinc-50 dark:hover:bg-zinc-900/60'
+                                : 'hover:bg-[#F7F8ED] dark:hover:bg-zinc-900/60'
                             }`}
                           >
                             {/* Circle check (reference style) */}

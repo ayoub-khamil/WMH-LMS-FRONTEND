@@ -82,7 +82,7 @@ export function Select({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between gap-2.5 bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${sizeClasses[size] || sizeClasses.md} ${buttonClassName}`}
+        className={`w-full flex items-center justify-between gap-2.5 bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${sizeClasses[size] || sizeClasses.md} ${buttonClassName}`}
       >
         <span className="truncate">{displayLabel}</span>
         <IconChevronDown
@@ -100,7 +100,7 @@ export function Select({
       >
         <div className="overflow-hidden w-full">
           <div
-            className={`w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-1 overflow-hidden shadow-sm ${menuClassName}`}
+            className={`w-full bg-[#F7F8ED] dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-1 overflow-hidden shadow-sm ${menuClassName}`}
           >
             <div className="max-h-60 overflow-y-auto py-0.5 divide-y divide-zinc-100 dark:divide-zinc-800/40">
               {parsedOptions.map((opt) => {
@@ -113,7 +113,7 @@ export function Select({
                     className={`w-full text-left px-3.5 py-2 text-xs sm:text-sm font-medium transition-colors flex items-center justify-between cursor-pointer ${
                       isSelected
                         ? 'bg-zinc-100 dark:bg-zinc-800 font-black text-zinc-900 dark:text-zinc-100'
-                        : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 hover:text-zinc-900 dark:hover:text-zinc-100'
+                        : 'text-zinc-700 dark:text-zinc-300 hover:bg-[#F7F8ED] dark:hover:bg-zinc-800/60 hover:text-zinc-900 dark:hover:text-zinc-100'
                     }`}
                   >
                     <span className="truncate">{opt.label}</span>

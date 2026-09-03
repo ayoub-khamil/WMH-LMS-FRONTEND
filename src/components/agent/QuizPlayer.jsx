@@ -182,7 +182,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
   const submitDisabled = submitting || (result && result.passed) || retakeLocked;
 
   return (
-    <div className={hideHeader ? 'space-y-8 w-full' : 'bg-white dark:bg-zinc-900 rounded-lg py-10 space-y-8 w-full'}>
+    <div className={hideHeader ? 'space-y-8 w-full' : 'bg-[#F7F8ED] dark:bg-zinc-900 rounded-lg py-10 space-y-8 w-full'}>
       {error && (
         <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
           {error}
@@ -226,7 +226,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
 
             {retakeLocked && (
               <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/70 dark:bg-zinc-950/40">
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#F7F8ED]/70 dark:bg-zinc-950/40">
                   <IconClock className="w-4 h-4 text-watermelon-red-800 dark:text-watermelon-red-300" />
                   <span className="text-xs font-bold uppercase tracking-wider text-watermelon-red-800 dark:text-watermelon-red-300">
                     Cooldown
@@ -294,7 +294,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
               className={`py-6 px-4 rounded-lg transition-colors border-l-4 ${
                 wasIncorrect
                   ? 'bg-watermelon-red-100/80 border-watermelon-red-400 dark:bg-watermelon-red-950/50 dark:border-watermelon-red-500'
-                  : 'bg-zinc-50 border-transparent dark:bg-zinc-950/60'
+                  : 'bg-[#F7F8ED] border-transparent dark:bg-zinc-950/60'
               }`}
             >
               <div className="flex items-start gap-4 mb-4">
@@ -322,7 +322,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
                       } ${
                         isChecked
                           ? 'bg-watermelon-green-50 text-zinc-900 dark:bg-watermelon-green-950/60 dark:text-watermelon-green-100 font-bold'
-                          : 'bg-white dark:bg-zinc-900 hover:bg-zinc-100/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium'
+                          : 'bg-[#F7F8ED] dark:bg-zinc-900 hover:bg-zinc-100/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium'
                       }`}
                     >
                       {/* Always a square checkbox, green bg + black ✓ when selected */}
@@ -330,7 +330,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
                         className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded ${
                           isChecked
                             ? 'bg-watermelon-green-500'
-                            : 'border-2 border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800'
+                            : 'border-2 border-zinc-300 dark:border-zinc-600 bg-[#F7F8ED] dark:bg-zinc-800'
                         }`}
                       >
                         {isChecked && (

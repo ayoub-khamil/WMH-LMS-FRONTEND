@@ -167,7 +167,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
         const completedPct = total > 0 ? (completedCount / total) * 100 : 0;
         const inProgressPct = total > 0 ? (inProgressCount / total) * 100 : 0;
         return (
-          <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
+          <div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-[#F7F8ED] dark:bg-zinc-900 overflow-hidden">
             <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 px-5 py-3.5">
               <div className="flex flex-col items-center gap-2 min-w-[90px]">
                 <div className="flex items-center justify-center w-8 h-8 rounded-md bg-zinc-100 dark:bg-zinc-800">
@@ -238,7 +238,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
         <div className="flat-card overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-zinc-50 dark:bg-zinc-900/70 border-b border-zinc-200 dark:border-zinc-800 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+              <tr className="bg-[#F7F8ED] dark:bg-zinc-900/70 border-b border-zinc-200 dark:border-zinc-800 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
                 <th className="py-3.5 px-4">Agent Name</th>
                 <th className="py-3.5 px-4">Email</th>
                 <th className="py-3.5 px-4">Status</th>
@@ -249,7 +249,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
             </thead>
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-sm">
               {assignments.map((assignment) => (
-                <tr key={assignment.agent_id} className="hover:bg-zinc-50/60 dark:hover:bg-zinc-900/40 transition-colors">
+                <tr key={assignment.agent_id} className="hover:bg-[#F7F8ED]/60 dark:hover:bg-zinc-900/40 transition-colors">
                   <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-zinc-100">
                     {assignment.agent_name}
                   </td>
@@ -318,7 +318,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
                 placeholder="Search available agents by name or email..."
                 value={agentSearch}
                 onChange={(e) => setAgentSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 font-medium placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400"
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 font-medium placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400"
               />
             </div>
             <Button
@@ -346,7 +346,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
                   <div
                     key={agent.id}
                     onClick={() => handleToggleSelectAgent(agent.id)}
-                    className={`flex items-center justify-between p-3 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors ${
+                    className={`flex items-center justify-between p-3 cursor-pointer hover:bg-[#F7F8ED] dark:hover:bg-zinc-800/50 transition-colors ${
                       isChecked ? 'bg-watermelon-green-50/60 dark:bg-watermelon-green-950/30' : ''
                     }`}
                   >
@@ -362,7 +362,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
                       className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${
                         isChecked
                           ? 'bg-watermelon-green-400 border-watermelon-green-500 text-zinc-950 font-bold'
-                          : 'border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800'
+                          : 'border-zinc-300 dark:border-zinc-700 bg-[#F7F8ED] dark:bg-zinc-800'
                       }`}
                     >
                       {isChecked && <IconCheck className="w-3.5 h-3.5" />}

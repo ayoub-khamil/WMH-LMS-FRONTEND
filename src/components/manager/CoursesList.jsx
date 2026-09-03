@@ -100,7 +100,7 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
               onChange={(e) => {
                 patch({ q: e.target.value, page: 1 }, { replace: true });
               }}
-              className="w-full pl-10 pr-4 py-2 text-sm bg-white dark:bg-zinc-900 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+              className="w-full pl-10 pr-4 py-2 text-sm bg-[#F7F8ED] dark:bg-zinc-900 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
             />
           </div>
 
@@ -159,7 +159,7 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
             return (
               <div
                 key={course.id}
-                className={`relative w-full bg-white dark:bg-zinc-900 rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all ${course.status === 'published' ? 'border-2 border-watermelon-green-400' : 'border-2 border-zinc-500'}`}
+                className={`relative w-full bg-[#F7F8ED] dark:bg-zinc-900 rounded-xl p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 transition-all ${course.status === 'published' ? 'border-2 border-watermelon-green-400' : 'border-2 border-zinc-500'}`}
               >
                 {/* Status badge sitting on the top border */}
                 <span className="absolute top-0 left-8 -translate-y-1/2">
@@ -277,7 +277,7 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
               placeholder="e.g. Inbound De-escalation & SLA Protocols"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+              className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
             />
           </div>
 
@@ -290,7 +290,7 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
               placeholder="Brief description of skills covered in this training..."
               value={newDesc}
               onChange={(e) => setNewDesc(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400"
+              className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400"
             />
           </div>
 

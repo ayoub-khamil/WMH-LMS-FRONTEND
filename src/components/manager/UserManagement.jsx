@@ -193,7 +193,7 @@ export function UserManagement() {
               onChange={(e) => {
                 patch({ q: e.target.value, page: 1 }, { replace: true });
               }}
-              className="w-full pl-10 pr-4 py-2 text-sm bg-white dark:bg-zinc-900 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+              className="w-full pl-10 pr-4 py-2 text-sm bg-[#F7F8ED] dark:bg-zinc-900 rounded-lg text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
             />
           </div>
 
@@ -253,7 +253,7 @@ export function UserManagement() {
         <div className="flat-card overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
-                <tr className="bg-zinc-50 dark:bg-zinc-900/70 border-b border-zinc-200 dark:border-zinc-800 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
+                <tr className="bg-[#F7F8ED] dark:bg-zinc-900/70 border-b border-zinc-200 dark:border-zinc-800 text-[11px] font-bold text-zinc-500 uppercase tracking-wider">
                   <th className="py-3 px-4">User</th>
                   <th className="py-3 px-4">Email</th>
                   <th className="py-3 px-4">Role</th>
@@ -264,7 +264,7 @@ export function UserManagement() {
             </thead>
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800 text-sm">
               {users.map((u) => (
-                <tr key={u.id} className="hover:bg-zinc-50/60 dark:hover:bg-zinc-900/40 transition-colors">
+                <tr key={u.id} className="hover:bg-[#F7F8ED]/60 dark:hover:bg-zinc-900/40 transition-colors">
                   <td className="py-3.5 px-4 font-bold text-zinc-900 dark:text-zinc-100">
                     {u.name}
                   </td>
@@ -323,7 +323,7 @@ export function UserManagement() {
                         onClick={() => setUserToDelete(u)}
                         title={u.is_root ? 'The root account cannot be modified' : 'Delete User'}
                         disabled={u.is_root}
-                        className={`p-1.5 rounded border border-zinc-200 dark:border-zinc-800 ${u.is_root ? 'text-zinc-300 dark:text-zinc-700 opacity-40 cursor-not-allowed' : 'text-watermelon-red-500 hover:text-watermelon-red-600 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors'}`}
+                        className={`p-1.5 rounded border border-zinc-200 dark:border-zinc-800 ${u.is_root ? 'text-zinc-300 dark:text-zinc-700 opacity-40 cursor-not-allowed' : 'text-watermelon-red-500 hover:text-watermelon-red-600 hover:bg-[#F7F8ED] dark:hover:bg-zinc-900 transition-colors'}`}
                       >
                         <IconTrash className="w-4 h-4" />
                       </button>
@@ -380,7 +380,7 @@ export function UserManagement() {
                 required
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+                className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
               />
             </div>
             <div>
@@ -392,7 +392,7 @@ export function UserManagement() {
                 required
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+                className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
               />
             </div>
           </div>
@@ -410,7 +410,7 @@ export function UserManagement() {
                 setEmail(e.target.value);
                 setEmailManuallyEdited(true);
               }}
-              className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+              className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
             />
           </div>
 
@@ -424,7 +424,7 @@ export function UserManagement() {
                 placeholder="Leave empty for auto-generated password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 pr-10 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+                className="w-full px-4 py-2.5 pr-10 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
               />
               <button
                 type="button"
@@ -490,7 +490,7 @@ export function UserManagement() {
                 required
                 value={editingUser?.first_name || ''}
                 onChange={(e) => setEditingUser(prev => ({ ...prev, first_name: e.target.value }))}
-                className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+                className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
               />
             </div>
             <div>
@@ -502,7 +502,7 @@ export function UserManagement() {
                 required
                 value={editingUser?.last_name || ''}
                 onChange={(e) => setEditingUser(prev => ({ ...prev, last_name: e.target.value }))}
-                className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+                className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
               />
             </div>
           </div>
@@ -516,7 +516,7 @@ export function UserManagement() {
               required
               value={editingUser?.email || ''}
               onChange={(e) => setEditingUser(prev => ({ ...prev, email: e.target.value }))}
-              className="w-full px-4 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+              className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
             />
           </div>
 
@@ -533,7 +533,7 @@ export function UserManagement() {
                 placeholder="Enter new password (leave empty to keep current)"
                 value={editPassword}
                 onChange={(e) => setEditPassword(e.target.value)}
-                className="w-full px-4 py-2.5 pr-10 text-sm bg-zinc-50 dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+                className="w-full px-4 py-2.5 pr-10 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
               />
               <button
                 type="button"
@@ -611,7 +611,7 @@ export function UserManagement() {
               {userAssignments.map((a, idx) => (
                 <div
                   key={idx}
-                  className="p-3 border border-zinc-200 dark:border-zinc-800 rounded bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between"
+                  className="p-3 border border-zinc-200 dark:border-zinc-800 rounded bg-[#F7F8ED]/50 dark:bg-zinc-900/30 flex items-center justify-between"
                 >
                   <div>
                     <h5 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">

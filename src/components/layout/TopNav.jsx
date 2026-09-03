@@ -8,7 +8,7 @@ export function TopNav({ title, breadcrumbs = [], actions = null }) {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="h-24 pt-4 pb-3 flex-shrink-0 bg-white dark:bg-zinc-950 flex items-center justify-between px-10 border-b border-zinc-100 dark:border-zinc-900 gap-4">
+    <header className="h-24 pt-4 pb-3 flex-shrink-0 bg-[#F7F8ED] dark:bg-zinc-950 flex items-center justify-between px-10 border-b border-zinc-100 dark:border-zinc-900 gap-4">
       {/* Title & Breadcrumbs */}
       <div className="flex flex-col space-y-1.5 pt-1 min-w-0">
         {breadcrumbs.length > 0 && (
@@ -51,7 +51,7 @@ export function TopNav({ title, breadcrumbs = [], actions = null }) {
 
         <button
           onClick={logout}
-          className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm font-bold text-zinc-600 dark:text-zinc-300 hover:text-watermelon-red-600 dark:hover:text-watermelon-red-400 hover:border-watermelon-red-200 dark:hover:border-watermelon-red-900/60 transition-colors cursor-pointer shadow-sm flex-shrink-0"
+          className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#F7F8ED] dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs sm:text-sm font-bold text-zinc-600 dark:text-zinc-300 hover:text-watermelon-red-600 dark:hover:text-watermelon-red-400 hover:border-watermelon-red-200 dark:hover:border-watermelon-red-900/60 transition-colors cursor-pointer shadow-sm flex-shrink-0"
           title="Sign Out"
         >
           <IconLogout className="w-4 h-4" />
@@ -61,7 +61,7 @@ export function TopNav({ title, breadcrumbs = [], actions = null }) {
         <button
           onClick={toggleTheme}
           aria-label="Toggle Theme"
-          className="p-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer shadow-sm flex-shrink-0"
+          className="p-1.5 rounded-full bg-[#F7F8ED] dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors cursor-pointer shadow-sm flex-shrink-0"
           title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
         >
           {theme === 'dark' ? <IconSun className="w-4 h-4" /> : <IconMoon className="w-4 h-4" />}
