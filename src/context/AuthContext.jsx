@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 import { getToken } from '../services/httpClient';
+import { reportError } from '../services/logger';
 
 const AuthContext = createContext();
 
@@ -13,7 +14,7 @@ function clearLegacyMockKeys() {
     localStorage.removeItem('wmh_lms_jwt_token');
     localStorage.removeItem('wmh_lms_current_user');
   } catch (e) {
-    console.error(e);
+    reportError(e);
   }
 }
 

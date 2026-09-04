@@ -3,8 +3,18 @@
 @tailwind utilities;
 
 @layer base {
-  *, ::before, ::after {
+  /* The design language is flat: no decorative shadows anywhere. The
+     :not(:focus-visible) carve-out is deliberate - Tailwind implements
+     ring-* AS a box-shadow, so banning it outright deleted every keyboard
+     focus indicator in the app. */
+  *:not(:focus-visible), ::before, ::after {
     box-shadow: none !important;
+  }
+
+  /* Guaranteed focus indicator even where no ring utility is applied. */
+  :focus-visible {
+    outline: 2px solid theme('colors.watermelon.green.500');
+    outline-offset: 2px;
   }
 
   html, body {

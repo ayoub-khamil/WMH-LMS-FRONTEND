@@ -91,10 +91,19 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
     e.preventDefault();
     if (!prompt.trim()) return;
 
-    // Validation: At least one correct answer
-    const hasCorrect = options.some(o => o.is_correct);
-    if (!hasCorrect) {
+    // Validation mirrors the server: every option needs text, there must be a
+    // correct answer, and single-choice types allow exactly one.
+    if (options.some(o => !o.text.trim())) {
+      setError('Every option needs text before this question can be saved.');
+      return;
+    }
+    const correctCount = options.filter(o => o.is_correct).length;
+    if (correctCount === 0) {
       setError('Please mark at least one option as the correct answer.');
+      return;
+    }
+    if (correctCount > 1 && (type === 'multiple_choice' || type === 'true_false')) {
+      setError('This question type allows exactly one correct answer.');
       return;
     }
 

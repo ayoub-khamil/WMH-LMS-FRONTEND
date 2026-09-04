@@ -17,8 +17,10 @@ import {
   IconDocumentText,
   IconQuestionMarkCircle,
   IconAudio,
-  IconBook
+  IconBook,
+  IconLock
 } from '../common/Icons';
+import { reportError } from '../../services/logger';
 
 export function CourseViewer({
   courseId,
@@ -59,7 +61,7 @@ export function CourseViewer({
         }
       }
     } catch (err) {
-      console.error(err);
+      reportError(err);
       setError(err.message || 'Failed to load course.');
     } finally {
       setLoading(false);
@@ -113,9 +115,17 @@ export function CourseViewer({
 
   useEffect(() => {
     if (!user?.id || !course?.id || !currentItem || currentItem.type === 'quiz') return;
-    markQuizContentReviewed(user.id, course.id, currentItem.id);
-    // Mirror to the server review gate (authoritative for quiz unlock).
-    api.learn.recordView(user.id, course.id, currentItem.id).catch(() => {});
+    let cancelled = false;
+    // The server owns the quiz review gate, so the local mirror is only
+    // credited once the server has actually recorded the view. Crediting it
+    // first would let the retry button unlock locally and then be refused
+    // with a 423.
+    api.learn.recordView(user.id, course.id, currentItem.id)
+      .then(() => {
+        if (!cancelled) markQuizContentReviewed(user.id, course.id, currentItem.id);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
   }, [user?.id, course?.id, currentItem?.id, currentItem?.type]);
 
   const handleReviewContent = () => {
@@ -161,7 +171,24 @@ export function CourseViewer({
     return <div className="py-28 text-center text-zinc-400 text-base font-medium">Preparing training workspace...</div>;
   }
 
-  if (!course || allItems.length === 0) {
+  // A failed load is not the same as an empty curriculum. The server refuses
+  // course content for anyone who is not enrolled (403), and that message is
+  // the useful thing to show.
+  if (!course) {
+    return (
+      <EmptyState
+        icon={error ? IconLock : IconBook}
+        title={error ? 'This course is not available' : 'Course not found'}
+        description={
+          error
+            || 'This course may have been removed. Return to your dashboard and try again.'
+        }
+        action={<Button variant="secondary" onClick={onBack}>Return to Dashboard</Button>}
+      />
+    );
+  }
+
+  if (allItems.length === 0) {
     return (
       <EmptyState
         icon={IconBook}
@@ -207,7 +234,7 @@ export function CourseViewer({
             </h2>
             {currentItem?.type === 'quiz' && (
               <p className="text-sm text-zinc-500 mt-1">
-                Achieve 100% accuracy to pass. A failed attempt starts a 5-minute review cooldown before the next try.
+                Achieve 100% accuracy to pass. A failed attempt starts a review cooldown before the next try.
               </p>
             )}
           </div>

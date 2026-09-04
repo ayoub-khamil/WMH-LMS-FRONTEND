@@ -7,6 +7,7 @@ import { Modal } from '../common/Modal';
 import { EmptyState } from '../common/EmptyState';
 import { Select } from '../common/Select';
 import { IconPlus, IconSearch, IconBook, IconPencil, IconTrash, IconLayers } from '../common/Icons';
+import { reportError } from '../../services/logger';
 
 export function CoursesList({ onSelectCourse, onManageAssignments }) {
   const [courses, setCourses] = useState([]);
@@ -35,7 +36,7 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
       setCourses(res.data);
       setTotalPages(res.pagination.totalPages || 1);
     } catch (err) {
-      console.error(err);
+      reportError(err);
       setError(err.message || 'Failed to load courses.');
     } finally {
       setLoading(false);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import { Button } from '../common/Button';
@@ -34,7 +34,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
     }
     setSelectedAnswers(filled);
     setResult(null);
-    setSubmitWarning(false);
+    setShowIncompleteHint(false);
   };
 
   const handleResetTimer = async () => {
@@ -50,6 +50,31 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
     setNow(Date.now());
   };
 
+  // Mirrors a GET /learn/quiz/lock payload into the local store.
+  // Returns true when the server still considers the quiz locked.
+  const applyServerLock = useCallback((s) => {
+    if (!s || s.can_retry) return false;
+    let lastResult = null;
+    try { lastResult = s.last_result ? JSON.parse(s.last_result) : null; }
+    catch { lastResult = null; }
+    setLock(startQuizUiLock({
+      agentId,
+      courseId,
+      quizItemId: item.id,
+      lastResult,
+      // Cooldown length is a server setting, so take it from the server
+      // rather than assuming the local fallback constant.
+      durationMs: (s.remaining_seconds || 0) * 1000,
+      reviewedItemIds: s.review_satisfied ? ['server'] : []
+    }));
+    if (lastResult && !lastResult.passed) {
+      setResult(lastResult);
+      setSelectedAnswers({});
+    }
+    setNow(Date.now());
+    return true;
+  }, [agentId, courseId, item.id]);
+
   useEffect(() => {
     const stored = getQuizUiLock(agentId, item.id);
     setLock(stored);
@@ -57,31 +82,21 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
       setResult(stored.lastResult);
       setSelectedAnswers({});
     }
-    // Server lock is authoritative (survives reload / new tab).
+    // Server lock is authoritative (survives reload / new tab). The mirror is
+    // never allowed to be stricter OR looser than the server.
     let cancelled = false;
     api.learn.getQuizLock(agentId, item.id)
       .then((s) => {
-        if (cancelled || !s || s.can_retry) return;
-        let lastResult = null;
-        try { lastResult = s.last_result ? JSON.parse(s.last_result) : null; }
-        catch { lastResult = null; }
-        setLock({
-          agentId,
-          courseId,
-          quizItemId: item.id,
-          lockedUntil: Date.now() + (s.remaining_seconds || 0) * 1000,
-          reviewedItemIds: s.review_satisfied ? ['server'] : [],
-          lastResult
-        });
-        if (lastResult && !lastResult.passed) {
-          setResult(lastResult);
-          setSelectedAnswers({});
+        if (cancelled) return;
+        if (!applyServerLock(s)) {
+          clearQuizUiLock(agentId, item.id);
+          setLock(null);
+          setNow(Date.now());
         }
-        setNow(Date.now());
       })
       .catch(() => {});
     return () => { cancelled = true; };
-  }, [agentId, item.id, courseId]);
+  }, [agentId, item.id, courseId, applyServerLock]);
 
   const lockStatus = getLockStatus(lock);
 
@@ -164,7 +179,9 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
           agentId,
           courseId,
           quizItemId: item.id,
-          lastResult: res
+          lastResult: res,
+          // The server decides how long the cooldown runs.
+          durationMs: (res.locked_seconds_remaining || 0) * 1000
         });
         setLock(nextLock);
         setNow(Date.now());
@@ -172,6 +189,15 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
         scrollToTop();
       }
     } catch (err) {
+      if (err.status === 423) {
+        // The server refused the retry: the cooldown is still running, or the
+        // review gate is unsatisfied. Re-sync instead of guessing locally.
+        try {
+          applyServerLock(await api.learn.getQuizLock(agentId, item.id));
+        } catch {
+          // Leave the mirror as-is; the message below still explains the block.
+        }
+      }
       setError(err.message || 'Failed to submit assessment.');
     } finally {
       setSubmitting(false);
@@ -199,7 +225,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
               {item.title}
             </h2>
             <p className="text-sm text-zinc-500 mt-1">
-              Achieve 100% accuracy to pass. A failed attempt starts a 5-minute review cooldown before the next try.
+              Achieve 100% accuracy to pass. A failed attempt starts a review cooldown before the next try.
             </p>
           </div>
           <Badge variant="neutral" className="px-3 py-1 text-xs font-bold tabular-nums">
@@ -217,10 +243,13 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
           <div className="flex-1 space-y-3">
             <div className="space-y-1">
               <h4 className="text-base font-black text-watermelon-red-900 dark:text-watermelon-red-200">
-                Score: {result.score} ({result.score_percentage}%) — Retake locked
+                Score: {result.score} ({result.score_percentage}%)
+                {retakeLocked ? ' — Retake locked' : ' — Ready to retry'}
               </h4>
               <p className="text-sm text-watermelon-red-800 dark:text-watermelon-red-300">
-                100% is required. Review the highlighted questions, then open the course content. You can retry only after the cooldown and after you have opened a previous module.
+                {retakeLocked
+                  ? '100% is required. Review the highlighted questions, then open the course content. You can retry only after the cooldown and after you have opened a previous module.'
+                  : '100% is required. Review the highlighted questions below, then submit again when you are ready.'}
               </p>
             </div>
 
@@ -288,8 +317,13 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
           const selected = selectedAnswers[q.id] || [];
           const wasIncorrect = result?.incorrect_question_ids?.includes(q.id);
 
+          // Single-answer questions are radios, multi-answer are checkboxes.
+          // These were clickable <div>s, which no keyboard or screen reader
+          // could operate; the visual treatment is unchanged.
+          const isSingle = q.type === 'multiple_choice' || q.type === 'true_false';
+
           return (
-            <div
+            <fieldset
               key={q.id}
               className={`py-6 px-4 rounded-lg transition-colors border-l-4 ${
                 wasIncorrect
@@ -297,16 +331,21 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
                   : 'bg-[#F7F8ED] border-transparent dark:bg-zinc-950/60'
               }`}
             >
-              <div className="flex items-start gap-4 mb-4">
+              <legend className="flex items-start gap-4 mb-4">
                 <div className="flex items-start space-x-3">
                   <span className="text-sm tabular-nums font-black text-watermelon-green-700 dark:text-watermelon-green-400 mt-0.5">
                     0{idx + 1}.
                   </span>
                   <p className="text-base font-bold text-zinc-900 dark:text-zinc-100 leading-snug">
                     {q.prompt}
+                    {!isSingle && (
+                      <span className="ml-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                        select all that apply
+                      </span>
+                    )}
                   </p>
                 </div>
-              </div>
+              </legend>
 
               {/* Options */}
               <div className="space-y-2.5 pl-7">
@@ -316,8 +355,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
                   return (
                     <label
                       key={opt.id}
-                      onClick={() => handleToggleOption(q.id, opt.id, q.type)}
-                      className={`flex items-center space-x-3.5 p-4 rounded-lg select-none transition-all ${
+                      className={`flex items-center space-x-3.5 p-4 rounded-lg select-none transition-all focus-within:outline focus-within:outline-2 focus-within:outline-watermelon-green-400 ${
                         retakeLocked ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
                       } ${
                         isChecked
@@ -325,8 +363,18 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
                           : 'bg-[#F7F8ED] dark:bg-zinc-900 hover:bg-zinc-100/80 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium'
                       }`}
                     >
-                      {/* Always a square checkbox, green bg + black ✓ when selected */}
-                      <div
+                      <input
+                        type={isSingle ? 'radio' : 'checkbox'}
+                        name={`question-${q.id}`}
+                        value={opt.id}
+                        checked={isChecked}
+                        disabled={retakeLocked}
+                        onChange={() => handleToggleOption(q.id, opt.id, q.type)}
+                        className="sr-only"
+                      />
+                      {/* Visual control. The real input above drives it. */}
+                      <span
+                        aria-hidden="true"
                         className={`w-5 h-5 flex-shrink-0 flex items-center justify-center rounded ${
                           isChecked
                             ? 'bg-watermelon-green-500'
@@ -336,14 +384,14 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
                         {isChecked && (
                           <IconCheck className="w-3.5 h-3.5 text-zinc-950" />
                         )}
-                      </div>
+                      </span>
                       <span className="text-sm">{opt.text}</span>
                     </label>
                   );
                 })}
               </div>
 
-            </div>
+            </fieldset>
           );
         })}
 

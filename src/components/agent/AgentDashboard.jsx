@@ -19,6 +19,7 @@ import {
 } from '../common/Icons';
 import lightLogoSrc from '/assets/newTransparentLogo.png';
 import darkLogoSrc from '/assets/darkModeLogo.png';
+import { reportError } from '../../services/logger';
 
 export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
   const { user, logout } = useAuth();
@@ -44,7 +45,7 @@ export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
     api.learn.getCourses(user.id)
       .then(data => setCoursesData(data))
       .catch((err) => {
-        console.error(err);
+        reportError(err);
         setError(err.message || 'Failed to load courses.');
       })
       .finally(() => setLoading(false));

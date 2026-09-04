@@ -19,6 +19,7 @@ import {
   IconAudio,
   IconBook
 } from '../common/Icons';
+import { reportError } from '../../services/logger';
 
 function findItemInCourse(course, itemId) {
   if (!course || itemId == null) return null;
@@ -61,7 +62,7 @@ export function CourseEditor({
       const data = await api.courses.getById(courseId);
       setCourse(data);
     } catch (err) {
-      console.error(err);
+      reportError(err);
       setError(err.message || 'Failed to load course.');
     } finally {
       setLoading(false);

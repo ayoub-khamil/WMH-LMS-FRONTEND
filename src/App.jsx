@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Navigate,
   Outlet,
@@ -14,12 +14,20 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoginScreen } from './components/auth/LoginScreen';
 import { Sidebar } from './components/layout/Sidebar';
 import { TopNav } from './components/layout/TopNav';
-import { CoursesList } from './components/manager/CoursesList';
-import { CourseEditor } from './components/manager/CourseEditor';
-import { AssignmentsManager } from './components/manager/AssignmentsManager';
-import { UserManagement } from './components/manager/UserManagement';
-import { AgentDashboard } from './components/agent/AgentDashboard';
-import { CourseViewer } from './components/agent/CourseViewer';
+// Route-level code splitting: the manager console and the learner experience
+// ship as separate chunks, so an agent never downloads the authoring screens.
+const CoursesList = React.lazy(() =>
+  import('./components/manager/CoursesList').then(m => ({ default: m.CoursesList })));
+const CourseEditor = React.lazy(() =>
+  import('./components/manager/CourseEditor').then(m => ({ default: m.CourseEditor })));
+const AssignmentsManager = React.lazy(() =>
+  import('./components/manager/AssignmentsManager').then(m => ({ default: m.AssignmentsManager })));
+const UserManagement = React.lazy(() =>
+  import('./components/manager/UserManagement').then(m => ({ default: m.UserManagement })));
+const AgentDashboard = React.lazy(() =>
+  import('./components/agent/AgentDashboard').then(m => ({ default: m.AgentDashboard })));
+const CourseViewer = React.lazy(() =>
+  import('./components/agent/CourseViewer').then(m => ({ default: m.CourseViewer })));
 import { IconSun, IconMoon, IconLogout } from './components/common/Icons';
 import { defaultHome, isAllowedPath, paths, viewFromPath } from './appRoutes';
 
@@ -212,10 +220,16 @@ function AppLayout() {
               </div>
             )}
             <div className="w-full p-8 md:p-10">
-              <Outlet context={{
-                progressRefreshKey,
-                onProgressUpdated: () => setProgressRefreshKey(k => k + 1)
-              }} />
+              <Suspense fallback={
+                <div className="py-28 text-center text-zinc-400 text-base font-medium">
+                  Loading...
+                </div>
+              }>
+                <Outlet context={{
+                  progressRefreshKey,
+                  onProgressUpdated: () => setProgressRefreshKey(k => k + 1)
+                }} />
+              </Suspense>
             </div>
           </main>
         </div>

@@ -82,7 +82,7 @@ export function Select({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between gap-2.5 bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${sizeClasses[size] || sizeClasses.md} ${buttonClassName}`}
+        className={`w-full flex items-center justify-between gap-2.5 bg-[#F7F8ED] dark:bg-zinc-900 rounded-lg text-zinc-900 dark:text-zinc-100 font-medium focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${sizeClasses[size] || sizeClasses.md} ${buttonClassName}`}
       >
         <span className="truncate">{displayLabel}</span>
         <IconChevronDown

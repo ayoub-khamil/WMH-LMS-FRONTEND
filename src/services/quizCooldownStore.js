@@ -1,7 +1,15 @@
+import { reportError } from './logger';
+
 /**
- * UI-only quiz retake lock (sessionStorage).
- * Swap these helpers for api.learn.getQuizLock / recordItemView later.
- * Not enforced by submitQuiz yet.
+ * Fast local mirror of the quiz retake lock (sessionStorage).
+ *
+ * The server is authoritative: POST /learn/quiz/submit enforces both the
+ * cooldown and the review gate, and GET /learn/quiz/lock is the source of
+ * truth across reloads. This store exists so the countdown can tick without
+ * polling, and it must never be more permissive than the server.
+ *
+ * Cooldown length is a server setting (Quiz:CooldownMinutes), so pass the
+ * duration the server reports rather than assuming the fallback below.
  */
 export const QUIZ_COOLDOWN_MS = 5 * 60 * 1000;
 const PREFIX = 'wmh_quiz_ui_lock_';
@@ -23,7 +31,7 @@ function write(k, val) {
   try {
     sessionStorage.setItem(k, JSON.stringify(val));
   } catch (e) {
-    console.error(e);
+    reportError(e);
   }
 }
 
@@ -32,13 +40,21 @@ export function getQuizUiLock(agentId, quizItemId) {
   return read(key(agentId, quizItemId));
 }
 
-export function startQuizUiLock({ agentId, courseId, quizItemId, lastResult }) {
+export function startQuizUiLock({
+  agentId,
+  courseId,
+  quizItemId,
+  lastResult,
+  durationMs,
+  reviewedItemIds
+}) {
+  const ms = Number.isFinite(durationMs) && durationMs >= 0 ? durationMs : QUIZ_COOLDOWN_MS;
   const lock = {
     agentId,
     courseId,
     quizItemId,
-    lockedUntil: Date.now() + QUIZ_COOLDOWN_MS,
-    reviewedItemIds: [],
+    lockedUntil: Date.now() + ms,
+    reviewedItemIds: reviewedItemIds || [],
     lastResult: lastResult || null
   };
   write(key(agentId, quizItemId), lock);
@@ -63,7 +79,7 @@ export function markQuizContentReviewed(agentId, courseId, viewedItemId) {
       }
     }
   } catch (e) {
-    console.error(e);
+    reportError(e);
   }
 }
 
@@ -71,7 +87,7 @@ export function clearQuizUiLock(agentId, quizItemId) {
   try {
     sessionStorage.removeItem(key(agentId, quizItemId));
   } catch (e) {
-    console.error(e);
+    reportError(e);
   }
 }
 

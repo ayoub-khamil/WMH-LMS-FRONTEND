@@ -6,5 +6,17 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true
+  },
+  build: {
+    // Generated but not referenced by the bundle: upload them to the error
+    // reporter rather than serving them to every visitor.
+    sourcemap: 'hidden',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom']
+        }
+      }
+    }
   }
 });

@@ -12,6 +12,13 @@ import { http } from './httpClient';
  *
  * NOTE: sessionStorage (services/quizCooldownStore.js) remains as a fast
  * local mirror, but the server lock is authoritative and survives reloads.
+ *
+ * The agent_id these calls send is a convenience only. The server derives
+ * identity from the bearer token: an agent may act only as themselves
+ * (403 otherwise), and every read and write requires an existing assignment
+ * for that course (403 if not enrolled). Quiz submission returns 423 while
+ * the cooldown is running or until another item in the course has been
+ * viewed (POST /learn/views).
  */
 export const learnApi = {
   getCourses(agentId) {

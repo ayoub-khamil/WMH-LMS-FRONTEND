@@ -7,6 +7,7 @@ import { Badge } from '../common/Badge';
 import { Modal } from '../common/Modal';
 import { EmptyState } from '../common/EmptyState';
 import { IconLayers, IconPlus, IconTrash, IconSearch, IconCheck, IconClock, IconArrowLeftSmall } from '../common/Icons';
+import { reportError } from '../../services/logger';
 
 export function AssignmentsManager({ initialCourseId = null }) {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
           setAssignments([]);
         }
       } catch (err) {
-        console.error(err);
+        reportError(err);
         setError(err.message || 'Failed to load assignments.');
       } finally {
         setLoadingDetail(false);

@@ -17,6 +17,7 @@ import {
   IconLock
 } from '../common/Icons';
 import { downloadCertificatePDF } from '../../services/certificate';
+import { reportError } from '../../services/logger';
 
 // ── Straight Vector Art Back Icon (10% larger) ───────────────────
 function IconStraightBack({ className = "w-[18px] h-[18px]" }) {
@@ -100,7 +101,7 @@ export function Sidebar({
       api.learn.getCourses(user.id).then(res => {
         const all = [...res.in_progress, ...res.not_started, ...res.completed];
         setAgentCourses(all);
-      }).catch(console.error);
+      }).catch((e) => reportError(e));
     }
   }, [isManager, user?.id, refreshTrigger]);
 
@@ -110,7 +111,13 @@ export function Sidebar({
       setLoadingCurriculum(true);
       api.learn.getCourseTree(activeCourseId, user.id)
         .then(tree => setActiveCourseTree(tree))
-        .catch(console.error)
+        .catch((err) => {
+          // The server refuses course content when the agent is not enrolled.
+          // Drop the tree so the sidebar cannot keep showing a curriculum the
+          // viewer is already refusing to render.
+          reportError(err);
+          setActiveCourseTree(null);
+        })
         .finally(() => setLoadingCurriculum(false));
     }
   }, [activeCourseId, isManager, user?.id, refreshTrigger]);

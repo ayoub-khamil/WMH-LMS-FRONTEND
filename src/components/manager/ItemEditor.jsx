@@ -5,6 +5,7 @@ import { Badge } from '../common/Badge';
 import { Select } from '../common/Select';
 import { QuizQuestionEditor } from './QuizQuestionEditor';
 import { IconVideo, IconDocumentText, IconQuestionMarkCircle, IconAudio, IconArrowLeft } from '../common/Icons';
+import { reportError } from '../../services/logger';
 
 export function ItemEditor({ item, onBack, onSaveSuccess }) {
   const [title, setTitle] = useState(item.title || '');
@@ -40,7 +41,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
         }
       }
     } catch (e) {
-      console.error(e);
+      reportError(e);
     }
   };
 
