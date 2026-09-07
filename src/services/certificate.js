@@ -6,9 +6,8 @@ import { jsPDF } from 'jspdf';
  * @param {string} params.agentName
  * @param {string} params.courseTitle
  * @param {string} params.completionDate
- * @param {number|string} params.courseId
  */
-export function downloadCertificatePDF({ agentName, courseTitle, completionDate, courseId }) {
+export function downloadCertificatePDF({ agentName, courseTitle, completionDate }) {
   // Create landscape A4 document
   const doc = new jsPDF({
     orientation: 'landscape',
@@ -68,35 +67,17 @@ export function downloadCertificatePDF({ agentName, courseTitle, completionDate,
   doc.setTextColor(15, 15, 15);
   doc.text(courseTitle, width / 2, 106, { align: 'center' });
 
-  // 7. Verification Meta
+  // 7. Issue date
   const formattedDate = completionDate ? new Date(completionDate).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  const certId = `WMH-${courseId}-${Date.now().toString().slice(-6)}`;
-
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
   doc.text(`Issue Date: ${formattedDate}`, 30, 140);
-  doc.text(`Certificate ID: ${certId}`, 30, 146);
-  doc.text('Score: 100% (Full Mastery)', 30, 152);
-
-  // 8. Signature Block
-  doc.setDrawColor(150, 150, 150);
-  doc.setLineWidth(0.5);
-  doc.line(width - 90, 142, width - 30, 142);
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(10);
-  doc.setTextColor(30, 30, 30);
-  doc.text('Sarah Jenkins', width - 60, 148, { align: 'center' });
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(120, 120, 120);
-  doc.text('Director of Operations & Compliance', width - 60, 154, { align: 'center' });
 
   // Generate Blob and trigger native browser file download
   const blob = doc.output('blob');
