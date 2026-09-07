@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ErrorBanner } from '../common/ErrorBanner';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useListQuery } from '../../useListQuery';
@@ -266,7 +267,7 @@ export function UserManagement() {
       setTotalPages(res.pagination.totalPages || 1);
     } catch (err) {
       reportError(err);
-      setError(err.message || 'Failed to load users.');
+      setError(err);
     } finally {
       setLoading(false);
     }
@@ -369,7 +370,7 @@ export function UserManagement() {
       await api.users.updateStatus(user.id, newStatus);
       await fetchUsers();
     } catch (err) {
-      setError(err.message || 'Failed to update status.');
+      setError(err);
     }
   };
 
@@ -381,7 +382,7 @@ export function UserManagement() {
       setUserToDelete(null);
       await fetchUsers();
     } catch (err) {
-      setError(err.message || 'Failed to delete user.');
+      setError(err);
     }
   };
 
@@ -400,11 +401,7 @@ export function UserManagement() {
 
   return (
     <div className="space-y-8">
-      {error && (
-        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
-          {error}
-        </div>
-      )}
+      <ErrorBanner error={error} />
       {/* Top Filter Bar */}
       <div className="flex flex-col sm:flex-row items-start justify-between gap-5">
         <div className="flex items-start space-x-3 w-full sm:w-auto flex-wrap sm:flex-nowrap">

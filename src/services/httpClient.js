@@ -1,4 +1,5 @@
 import { reportError } from './logger';
+import { ApiError } from './ApiError';
 
 /**
  * Centralized HTTP client for real API integration.
@@ -6,7 +7,8 @@ import { reportError } from './logger';
  * - Base URL comes from `VITE_API_BASE_URL` (e.g. https://api.example.com/v1).
  *   Falls back to `/api` so a Vite dev-server proxy can be used.
  * - Attaches `Authorization: Bearer <JWT>` when a token is available.
- * - Normalizes errors to `Error` with `status` + `payload` attached.
+ * - Throws `ApiError` with `status`, `payload` and the `correlationId` the
+ *   server logged the request under.
  * - Dispatches `auth:unauthorized` on 401 so AuthContext can log out.
  */
 
@@ -57,10 +59,11 @@ export async function request(path, { method = 'GET', body, auth = true, params 
       body: body !== undefined ? JSON.stringify(body) : undefined
     });
   } catch (e) {
-    const err = new Error('Network error. Please check your connection and try again.');
-    err.status = 0;
-    err.cause = e;
-    throw err;
+    throw new ApiError('Network error. Please check your connection and try again.', {
+      status: 0,
+      payload: null,
+      correlationId: null
+    });
   }
 
   if (res.status === 401 && auth) {
@@ -69,14 +72,12 @@ export async function request(path, { method = 'GET', body, auth = true, params 
 
   const text = await res.text();
   const payload = text ? safeJson(text) : null;
+  const correlationId = res.headers.get('X-Correlation-Id') || null;
 
   if (!res.ok) {
     const message =
       payload?.message || payload?.error || `Request failed (${res.status})`;
-    const err = new Error(message);
-    err.status = res.status;
-    err.payload = payload;
-    throw err;
+    throw new ApiError(message, { status: res.status, payload, correlationId });
   }
 
   return payload;

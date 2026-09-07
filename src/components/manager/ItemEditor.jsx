@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ErrorBanner } from '../common/ErrorBanner';
 import { api } from '../../services/api';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
@@ -59,7 +60,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
       });
       onSaveSuccess();
     } catch (err) {
-      setError(err.message || 'Failed to save item.');
+      setError(err);
     } finally {
       setSaving(false);
     }
@@ -67,11 +68,7 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
 
   return (
     <div className="space-y-8">
-      {error && (
-        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
-          {error}
-        </div>
-      )}
+      <ErrorBanner error={error} />
       {/* Header */}
       <div className="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center space-x-3">

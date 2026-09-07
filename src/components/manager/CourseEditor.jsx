@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ErrorBanner } from '../common/ErrorBanner';
 import { api } from '../../services/api';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
@@ -63,7 +64,7 @@ export function CourseEditor({
       setCourse(data);
     } catch (err) {
       reportError(err);
-      setError(err.message || 'Failed to load course.');
+      setError(err);
     } finally {
       setLoading(false);
     }
@@ -85,7 +86,7 @@ export function CourseEditor({
       const updated = await api.courses.update(course.id, { status: newStatus });
       setCourse(prev => ({ ...prev, status: updated.status }));
     } catch (err) {
-      setError(err.message || 'Request failed.');
+      setError(err);
     }
   };
 
@@ -99,7 +100,7 @@ export function CourseEditor({
       setNewSectionTitle('');
       await loadCourse();
     } catch (err) {
-      setError(err.message || 'Request failed.');
+      setError(err);
     }
   };
 
@@ -111,7 +112,7 @@ export function CourseEditor({
       setEditingSection(null);
       await loadCourse();
     } catch (err) {
-      setError(err.message || 'Request failed.');
+      setError(err);
     }
   };
 
@@ -127,7 +128,7 @@ export function CourseEditor({
       setSectionToDelete(null);
       await loadCourse();
     } catch (err) {
-      setError(err.message || 'Request failed.');
+      setError(err);
     }
   };
 
@@ -146,7 +147,7 @@ export function CourseEditor({
       await api.courses.reorderSections(course.id, section_ids);
       await loadCourse();
     } catch (err) {
-      setError(err.message || 'Request failed.');
+      setError(err);
     }
   };
 
@@ -166,7 +167,7 @@ export function CourseEditor({
       await loadCourse();
       if (onEditItem) onEditItem(created.id);
     } catch (err) {
-      setError(err.message || 'Request failed.');
+      setError(err);
     }
   };
 
@@ -188,7 +189,7 @@ export function CourseEditor({
       await loadCourse();
       if (Number(editingItemId) === Number(deletedId) && onCloseItem) onCloseItem();
     } catch (err) {
-      setError(err.message || 'Request failed.');
+      setError(err);
     }
   };
 
@@ -210,7 +211,7 @@ export function CourseEditor({
       await api.courses.reorderItems(sectionId, item_ids);
       await loadCourse();
     } catch (err) {
-      setError(err.message || 'Request failed.');
+      setError(err);
     }
   };
 
@@ -264,11 +265,7 @@ export function CourseEditor({
 
   return (
     <div className="space-y-8">
-      {error && (
-        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
-          {error}
-        </div>
-      )}
+      <ErrorBanner error={error} />
       {/* Top Header Controls */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800 gap-4">
         <div className="flex items-center space-x-3">

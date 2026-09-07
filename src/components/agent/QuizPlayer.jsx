@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { ErrorBanner } from '../common/ErrorBanner';
 import { api } from '../../services/api';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
@@ -170,7 +171,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
           // Leave the mirror as-is; the message below still explains the block.
         }
       }
-      setError(err.message || 'Failed to submit assessment.');
+      setError(err);
     } finally {
       setSubmitting(false);
     }
@@ -181,11 +182,7 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
 
   return (
     <div className={hideHeader ? 'space-y-8 w-full' : 'bg-[#F7F8ED] dark:bg-zinc-900 rounded-lg py-10 space-y-8 w-full'}>
-      {error && (
-        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
-          {error}
-        </div>
-      )}
+      <ErrorBanner error={error} />
       {/* Quiz Header — only shown when not embedded inside CourseViewer */}
       {!hideHeader && (
         <div className="pb-5 border-b border-zinc-100 dark:border-zinc-800 flex items-start justify-between gap-5">

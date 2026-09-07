@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ErrorBanner } from '../common/ErrorBanner';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../common/Button';
@@ -62,7 +63,7 @@ export function CourseViewer({
       }
     } catch (err) {
       reportError(err);
-      setError(err.message || 'Failed to load course.');
+      setError(err);
     } finally {
       setLoading(false);
     }
@@ -153,7 +154,7 @@ export function CourseViewer({
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } catch (err) {
-      setError(err.message || 'Failed to save progress.');
+      setError(err);
     } finally {
       setCompleting(false);
     }
@@ -180,7 +181,7 @@ export function CourseViewer({
         icon={error ? IconLock : IconBook}
         title={error ? 'This course is not available' : 'Course not found'}
         description={
-          error
+          error?.message
             || 'This course may have been removed. Return to your dashboard and try again.'
         }
         action={<Button variant="secondary" onClick={onBack}>Return to Dashboard</Button>}
@@ -207,11 +208,7 @@ export function CourseViewer({
 
       {/* Main Single-Item Focus Container */}
       <div className="flex-1 max-w-4xl w-full mx-auto px-6 py-10">
-        {error && (
-          <div className="mb-5 p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
-            {error}
-          </div>
-        )}
+        <ErrorBanner error={error} className="mb-5" />
 
         {/* Navigation Breadcrumb */}
         <div className="mb-5 text-xs tabular-nums font-bold text-zinc-400 flex items-center space-x-2">

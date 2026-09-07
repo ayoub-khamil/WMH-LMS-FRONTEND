@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ErrorBanner } from '../common/ErrorBanner';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
 import { paths } from '../../appRoutes';
@@ -45,7 +46,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
         }
       } catch (err) {
         reportError(err);
-        setError(err.message || 'Failed to load assignments.');
+        setError(err);
       } finally {
         setLoadingDetail(false);
       }
@@ -74,7 +75,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
       const cohortRes = await api.assignments.getCourseAssignments(selectedCourseId);
       setAssignments(cohortRes);
     } catch (err) {
-      setError(err.message || 'Failed to unassign agent.');
+      setError(err);
     }
   };
 
@@ -110,7 +111,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
       const cohortRes = await api.assignments.getCourseAssignments(selectedCourseId);
       setAssignments(cohortRes);
     } catch (err) {
-      setError(err.message || 'Failed to enroll agents.');
+      setError(err);
     } finally {
       setAssigning(false);
     }
@@ -126,11 +127,7 @@ export function AssignmentsManager({ initialCourseId = null }) {
 
   return (
     <div className="space-y-8">
-      {error && (
-        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
-          {error}
-        </div>
-      )}
+      <ErrorBanner error={error} />
       <div className="flex flex-col sm:flex-row items-start justify-between gap-5 pb-4 border-b border-zinc-200 dark:border-zinc-800">
         <div className="flex items-center gap-3 min-w-0">
           <button

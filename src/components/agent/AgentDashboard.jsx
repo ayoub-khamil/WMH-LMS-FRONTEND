@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ErrorBanner } from '../common/ErrorBanner';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import { DASHBOARD_TABS } from '../../appRoutes';
@@ -46,7 +47,7 @@ export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
       .then(data => setCoursesData(data))
       .catch((err) => {
         reportError(err);
-        setError(err.message || 'Failed to load courses.');
+        setError(err);
       })
       .finally(() => setLoading(false));
   }, [user.id, refreshTrigger, reloadKey]);
@@ -143,12 +144,7 @@ export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
           Loading your training courses…
         </div>
       ) : error ? (
-        <div className="py-16 text-center space-y-4">
-          <p className="text-sm font-semibold text-watermelon-red-600 dark:text-watermelon-red-400">{error}</p>
-          <Button variant="secondary" size="md" onClick={() => setReloadKey(k => k + 1)}>
-            Retry
-          </Button>
-        </div>
+        <ErrorBanner error={error} onRetry={() => setReloadKey(k => k + 1)} />
       ) : displayedCourses.length === 0 ? (
         <EmptyState
           icon={IconAcademicCap}

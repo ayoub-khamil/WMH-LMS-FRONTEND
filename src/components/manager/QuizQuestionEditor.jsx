@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ErrorBanner } from '../common/ErrorBanner';
 import { api } from '../../services/api';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
@@ -126,7 +127,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
       setIsModalOpen(false);
       onQuestionsUpdated();
     } catch (err) {
-      setError(err.message || 'Failed to save question.');
+      setError(err);
     } finally {
       setSaving(false);
     }
@@ -144,17 +145,13 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
       setQuestionToDelete(null);
       onQuestionsUpdated();
     } catch (err) {
-      setError(err.message || 'Failed to delete question.');
+      setError(err);
     }
   };
 
   return (
     <div className="space-y-4">
-      {error && (
-        <div className="p-4 rounded-xl border border-watermelon-red-200 dark:border-watermelon-red-900/60 bg-watermelon-red-50 dark:bg-watermelon-red-950/40 text-watermelon-red-900 dark:text-watermelon-red-200 text-xs font-semibold">
-          {error}
-        </div>
-      )}
+      <ErrorBanner error={error} />
       <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
           <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
