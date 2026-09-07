@@ -764,7 +764,6 @@ export function UserManagement() {
               confirmation={editPasswordConfirm}
               onPasswordChange={setEditPassword}
               onConfirmationChange={setEditPasswordConfirm}
-              helpText="The stored password cannot be displayed - only replaced."
             />
 
             <div>
