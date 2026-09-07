@@ -53,7 +53,6 @@ export const api = {
     completeItem: (itemId, courseId, agentId) => learnApi.completeItem(itemId, courseId, agentId),
     submitQuiz: (itemId, courseId, agentId, answers) => learnApi.submitQuiz(itemId, courseId, agentId, answers),
     recordView: (agentId, courseId, viewedItemId) => learnApi.recordView(agentId, courseId, viewedItemId),
-    getQuizLock: (agentId, itemId) => learnApi.getQuizLock(agentId, itemId),
-    resetQuizLock: (agentId, itemId) => learnApi.resetQuizLock(agentId, itemId)
+    getQuizLock: (agentId, itemId) => learnApi.getQuizLock(agentId, itemId)
   }
 };

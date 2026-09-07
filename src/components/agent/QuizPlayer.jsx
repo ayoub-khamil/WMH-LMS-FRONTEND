@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { api } from '../../services/api';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
@@ -22,33 +21,6 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
   const [now, setNow] = useState(Date.now());
   const [error, setError] = useState('');
   const [showIncompleteHint, setShowIncompleteHint] = useState(false);
-  const [searchParams] = useSearchParams();
-  // Testing hook: only visible with ?autofill in the URL. Never shown otherwise.
-  const showAutofill = searchParams.has('autofill');
-
-  const handleAutofillCorrect = () => {
-    if (retakeLocked) return;
-    const filled = {};
-    for (const q of questions) {
-      filled[q.id] = (q.options || []).filter(o => o.is_correct).map(o => o.id);
-    }
-    setSelectedAnswers(filled);
-    setResult(null);
-    setShowIncompleteHint(false);
-  };
-
-  const handleResetTimer = async () => {
-    try {
-      await api.learn.resetQuizLock(agentId, item.id);
-    } catch {
-      // Dev helper only; server errors must not block local unlock.
-    }
-    clearQuizUiLock(agentId, item.id);
-    setLock(null);
-    setResult(null);
-    setSelectedAnswers({});
-    setNow(Date.now());
-  };
 
   // Mirrors a GET /learn/quiz/lock payload into the local store.
   // Returns true when the server still considers the quiz locked.
@@ -423,27 +395,6 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
             <p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500">
               Answer all {questions.length} questions to enable submit.
             </p>
-          )}
-          {showAutofill && (
-            <div className="flex items-center gap-4">
-              <button
-                type="button"
-                onClick={handleAutofillCorrect}
-                disabled={submitDisabled}
-                className="text-xs font-mono text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 disabled:opacity-40 underline underline-offset-2 cursor-pointer"
-                title="Testing helper: tick all correct answers"
-              >
-                autofill correct (test)
-              </button>
-              <button
-                type="button"
-                onClick={handleResetTimer}
-                className="text-xs font-mono text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 underline underline-offset-2 cursor-pointer"
-                title="Testing helper: clear the retake cooldown on server and client"
-              >
-                reset timer (test)
-              </button>
-            </div>
           )}
         </div>
       </form>

@@ -50,8 +50,5 @@ export const learnApi = {
   },
   getQuizLock(agentId, itemId) {
     return http.get('/learn/quiz/lock', { params: { agent_id: agentId, item_id: itemId } });
-  },
-  resetQuizLock(agentId, itemId) {
-    return http.del('/dev/quiz-lock', undefined, { params: { agent_id: agentId, item_id: itemId } });
   }
 };
