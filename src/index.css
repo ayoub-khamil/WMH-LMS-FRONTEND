@@ -21,6 +21,19 @@
     scrollbar-gutter: auto;
   }
 
+  /* Safety net for the whole `.sr-only` pattern. Tailwind's .sr-only is
+     position:absolute with no top/left, so a visually hidden control whose
+     nearest positioned ancestor is the initial containing block gets placed
+     at a document coordinate far below the fold once its scroll pane is
+     scrolled. That grows <html> past the viewport, and focusing the control
+     (clicking its visible label) scrolls the fixed-height app shell out of
+     view — the screen goes blank. Anchor any such control to the label that
+     wraps it. QuizPlayer also sets `relative` explicitly; this catches
+     anything added later. */
+  label:has(> .sr-only) {
+    position: relative;
+  }
+
   main {
     scrollbar-gutter: stable;
   }

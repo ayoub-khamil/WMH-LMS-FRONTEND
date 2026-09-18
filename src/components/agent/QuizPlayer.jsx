@@ -322,9 +322,21 @@ export function QuizPlayer({ item, courseId, agentId, onQuizPassed, onReviewCont
                   const isChecked = selected.includes(opt.id);
 
                   return (
+                    // `relative` is load-bearing, not decoration. The real
+                    // <input> below is `sr-only`, i.e. position:absolute with
+                    // no offsets. Without a positioned ancestor its containing
+                    // block is the initial containing block, so the 1px box
+                    // lands at a *document* coordinate matching how far the
+                    // quiz pane is scrolled — which makes <html> taller than
+                    // the viewport even though the app shell is h-screen
+                    // overflow-hidden. Clicking the label focuses that input,
+                    // the browser scrolls it into view, and the whole
+                    // fixed-height shell slides off-screen, leaving the page
+                    // partly or entirely blank. Anchoring the input to its own
+                    // label keeps it where it is already visible.
                     <label
                       key={opt.id}
-                      className={`flex items-center space-x-3.5 p-4 rounded-lg select-none transition-all focus-within:outline focus-within:outline-2 focus-within:outline-watermelon-green-400 ${
+                      className={`relative flex items-center space-x-3.5 p-4 rounded-lg select-none transition-all focus-within:outline focus-within:outline-2 focus-within:outline-watermelon-green-400 ${
                         retakeLocked ? 'cursor-not-allowed opacity-70' : 'cursor-pointer'
                       } ${
                         isChecked
