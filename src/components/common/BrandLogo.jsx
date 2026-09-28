@@ -15,7 +15,7 @@ export function BrandLogo({ className = '' }) {
       onClick={() => window.location.reload()}
       title="Refresh page"
       aria-label="Refresh page"
-      className="flex-shrink-0 min-w-0 rounded-md cursor-pointer transition-opacity hover:opacity-80"
+      className="flex-shrink-0 min-w-0 rounded-md cursor-pointer transition-transform duration-150 ease-out hover:scale-[1.04] motion-reduce:transition-none"
     >
       <img
         src={theme === 'dark' ? darkLogoSrc : lightLogoSrc}
