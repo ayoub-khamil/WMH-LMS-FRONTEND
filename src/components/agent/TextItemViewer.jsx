@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { isHtml, sanitizeHtml } from '../../services/richText';
+import { readOnlyGuard } from '../../services/copyGuard';
 
 export function TextItemViewer({ content, title, hideHeader = false }) {
+  // Items saved before the formatted reader are plain text and keep
+  // rendering exactly as they always have.
+  const html = useMemo(() => (isHtml(content) ? sanitizeHtml(content) : null), [content]);
+
   return (
     <div className="bg-[#F7F8ED] dark:bg-zinc-900 rounded-lg py-10 space-y-8 w-full">
       {!hideHeader && (
@@ -14,10 +20,19 @@ export function TextItemViewer({ content, title, hideHeader = false }) {
         </div>
       )}
 
-      <div
-        className="text-base leading-relaxed text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap"
-      >
-        {content || 'No content provided for this guide.'}
+      {/* View-only: selection, copy, drag and the context menu are off, and
+          the content is left out of printouts. */}
+      <div {...readOnlyGuard} className="select-none no-print">
+        {html ? (
+          <div
+            className="rich-text text-base text-zinc-800 dark:text-zinc-200"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        ) : (
+          <div className="text-base leading-relaxed text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap">
+            {content || 'No content provided for this guide.'}
+          </div>
+        )}
       </div>
     </div>
   );

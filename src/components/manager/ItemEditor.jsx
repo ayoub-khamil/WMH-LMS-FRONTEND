@@ -5,6 +5,7 @@ import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 import { Select } from '../common/Select';
 import { QuizQuestionEditor } from './QuizQuestionEditor';
+import { RichTextEditor } from './RichTextEditor';
 import { IconVideo, IconDocumentText, IconQuestionMarkCircle, IconAudio, IconArrowLeft } from '../common/Icons';
 import { reportError } from '../../services/logger';
 
@@ -175,13 +176,10 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
               <h4 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
                 Text Content
               </h4>
-              <textarea
-                rows={12}
-                value={textContent}
-                onChange={(e) => setTextContent(e.target.value)}
-                placeholder="Paste or type plain text here. What you type is exactly what agents see."
-                className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-sans leading-relaxed whitespace-pre-wrap font-medium"
-              />
+              <p className="text-[11px] text-zinc-400">
+                Paste straight from Word, Google Docs or a PDF. Headings, lists, tables and links are kept; fonts, colours and images are dropped.
+              </p>
+              <RichTextEditor value={textContent} onChange={setTextContent} />
             </div>
           )}
 

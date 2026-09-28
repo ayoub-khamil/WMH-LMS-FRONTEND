@@ -88,3 +88,55 @@ html.dark main.course-scroll::-webkit-scrollbar-button:single-button:vertical:in
 .flat-card {
   @apply bg-[#F7F8ED] dark:bg-zinc-900 rounded-lg;
 }
+
+/* ── Formatted text items ─────────────────────────────────────────────
+   Shared by the agent reader and the manager editor, so what a manager
+   pastes looks the same as what an agent reads. Preflight strips all
+   element styling, so each allowed tag is given its look back here. */
+.rich-text {
+  @apply leading-relaxed break-words;
+}
+.rich-text > * + * {
+  @apply mt-4;
+}
+.rich-text h1 { @apply text-2xl font-black text-zinc-900 dark:text-zinc-100 mt-8; }
+.rich-text h2 { @apply text-xl font-black text-zinc-900 dark:text-zinc-100 mt-8; }
+.rich-text h3 { @apply text-lg font-bold text-zinc-900 dark:text-zinc-100 mt-6; }
+.rich-text h4 { @apply text-base font-bold text-zinc-900 dark:text-zinc-100 mt-6; }
+.rich-text > :first-child { @apply mt-0; }
+.rich-text strong, .rich-text b { @apply font-bold; }
+.rich-text em, .rich-text i { @apply italic; }
+.rich-text u { @apply underline; }
+.rich-text s { @apply line-through; }
+.rich-text ul { @apply list-disc pl-6 space-y-1; }
+.rich-text ol { @apply list-decimal pl-6 space-y-1; }
+.rich-text li > p + p { @apply mt-1; }
+.rich-text ul ul, .rich-text ol ol, .rich-text ul ol, .rich-text ol ul { @apply mt-1; }
+.rich-text a {
+  @apply text-watermelon-green-700 dark:text-watermelon-green-400 underline underline-offset-2 font-semibold;
+}
+.rich-text blockquote {
+  @apply border-l-4 border-watermelon-green-400 pl-4 italic text-zinc-600 dark:text-zinc-400;
+}
+.rich-text hr { @apply border-zinc-200 dark:border-zinc-800 my-6; }
+.rich-text code { @apply font-mono text-sm px-1 rounded bg-zinc-100 dark:bg-zinc-800; }
+.rich-text pre { @apply font-mono text-sm p-4 rounded-lg bg-zinc-100 dark:bg-zinc-800 overflow-x-auto; }
+.rich-text pre code { @apply p-0 bg-transparent; }
+.rich-text table {
+  @apply w-full border-collapse text-sm;
+}
+.rich-text th, .rich-text td {
+  @apply border border-zinc-300 dark:border-zinc-700 px-3 py-2 align-top text-left;
+}
+.rich-text th { @apply bg-zinc-100 dark:bg-zinc-800 font-bold; }
+.rich-text td > p, .rich-text th > p { @apply m-0; }
+
+/* Editor-only: tables need a scroll container and a visible selection. */
+.ProseMirror .tableWrapper { @apply overflow-x-auto; }
+.ProseMirror .selectedCell { @apply bg-watermelon-green-100 dark:bg-watermelon-green-950/60; }
+.ProseMirror:focus-visible { outline: none; }
+
+/* Course material and notes stay out of printouts. */
+@media print {
+  .no-print { display: none !important; }
+}
