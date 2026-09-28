@@ -35,6 +35,8 @@ export function CourseViewer({
   const { user, isManager } = useAuth();
   const [course, setCourse] = useState(null);
   const [notesOpen, setNotesOpen] = useState(false);
+  // The server's completion time, so certificates carry the real date.
+  const [completedAt, setCompletedAt] = useState(null);
   const [completedItemIds, setCompletedItemIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
@@ -48,6 +50,7 @@ export function CourseViewer({
       const tree = await api.learn.getCourseTree(courseId, user.id);
       setCourse(tree);
       setCompletedItemIds(tree.completed_item_ids || []);
+      setCompletedAt(tree.completed_at || null);
 
       if (!activeItemId) {
         const replaceOpts = { replace: true };
@@ -88,6 +91,9 @@ export function CourseViewer({
   const nextItem = currentIndex >= 0 && currentIndex < allItems.length - 1 ? allItems[currentIndex + 1] : null;
   const isCurrentCompleted = currentItem && completedItemIds.includes(currentItem.id);
   const isLastItem = currentIndex === allItems.length - 1;
+  // A quiz with no questions has nothing to pass; it is completed like a
+  // reading item so it can never block the rest of the course.
+  const isGradedQuiz = currentItem?.type === 'quiz' && (currentItem.questions?.length || 0) > 0;
 
   const previousContentItem = (() => {
     if (currentIndex <= 0) {
@@ -149,6 +155,7 @@ export function CourseViewer({
       setCompletedItemIds(updatedCompleted);
       
       if (onProgressUpdated) onProgressUpdated();
+      if (res.completed_at) setCompletedAt(res.completed_at);
 
       if (res.is_course_completed || isLastItem) {
         setShowCompletionModal(true);
@@ -168,6 +175,10 @@ export function CourseViewer({
     if (onProgressUpdated) onProgressUpdated();
     if (isLastItem) {
       setShowCompletionModal(true);
+      // Passing the last quiz completes the course; fetch the recorded time.
+      api.learn.getCourseTree(courseId, user.id)
+        .then((tree) => setCompletedAt(tree.completed_at || null))
+        .catch((err) => reportError(err));
     }
   };
 
@@ -234,14 +245,14 @@ export function CourseViewer({
             <h2 className="text-2xl font-black text-zinc-900 dark:text-zinc-100 mt-1">
               {currentItem?.title}
             </h2>
-            {currentItem?.type === 'quiz' && (
+            {isGradedQuiz && (
               <p className="text-sm text-zinc-500 mt-1">
                 Achieve 100% accuracy to pass. A failed attempt starts a review cooldown before the next try.
               </p>
             )}
           </div>
           <div className="flex-shrink-0 flex items-center gap-3">
-            {isCurrentCompleted && currentItem?.type !== 'quiz' && (
+            {isCurrentCompleted && !isGradedQuiz && (
               <Badge variant="completed" className="px-3 py-1 font-bold text-xs">
                 <IconCheck className="w-4 h-4 mr-1.5" /> COMPLETED
               </Badge>
@@ -283,7 +294,13 @@ export function CourseViewer({
           />
         )}
 
-        {currentItem?.type === 'quiz' && (
+        {currentItem?.type === 'quiz' && !isGradedQuiz && (
+          <div className="rounded-lg border border-dashed border-zinc-300 dark:border-zinc-700 p-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
+            No questions have been added to this assessment yet. You can continue to the next module.
+          </div>
+        )}
+
+        {isGradedQuiz && (
           <QuizPlayer
             item={currentItem}
             courseId={course.id}
@@ -304,7 +321,7 @@ export function CourseViewer({
         )}
 
         {/* Bottom Primary Progression Bar: "Complete & Continue" */}
-        {currentItem?.type !== 'quiz' && (
+        {!isGradedQuiz && (
           <div className="mt-14 pt-8 border-t border-zinc-100 dark:border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-5 bg-gradient-to-r from-watermelon-green-50/50 to-transparent dark:from-watermelon-green-950/20 p-6 rounded-lg">
             <div className="text-sm text-zinc-600 dark:text-zinc-400">
               {isLastItem ? (
@@ -332,7 +349,7 @@ export function CourseViewer({
         )}
 
         {/* If Quiz is 100% Passed, show the same progression bar as lessons */}
-        {currentItem?.type === 'quiz' && isCurrentCompleted && !isLastItem && (
+        {isGradedQuiz && isCurrentCompleted && !isLastItem && (
           <div className="mt-14 pt-8 border-t border-zinc-100 dark:border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-5 bg-gradient-to-r from-watermelon-green-50/50 to-transparent dark:from-watermelon-green-950/20 p-6 rounded-lg">
             <div className="text-sm text-zinc-600 dark:text-zinc-400">
               <span>
@@ -377,6 +394,7 @@ export function CourseViewer({
         isOpen={showCompletionModal}
         onClose={() => setShowCompletionModal(false)}
         course={course}
+        completedAt={completedAt}
         agentName={user?.name || 'Agent Specialist'}
         onReturnToDashboard={() => {
           setShowCompletionModal(false);

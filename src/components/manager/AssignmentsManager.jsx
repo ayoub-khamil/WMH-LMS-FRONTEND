@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ErrorBanner } from '../common/ErrorBanner';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
@@ -10,13 +10,22 @@ import { EmptyState } from '../common/EmptyState';
 import { IconLayers, IconPlus, IconTrash, IconSearch, IconCheck, IconClock, IconArrowLeftSmall } from '../common/Icons';
 import { reportError } from '../../services/logger';
 
+const AGENT_PAGE_SIZE = 50;
+
 export function AssignmentsManager({ initialCourseId = null }) {
   const navigate = useNavigate();
-  const [courses, setCourses] = useState([]);
+  const [currentCourse, setCurrentCourse] = useState(null);
   const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [assignments, setAssignments] = useState([]);
-  const [allAgents, setAllAgents] = useState([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
+
+  // Enrol picker: searched and paged on the server, so it is not capped at
+  // however many agents fit in one request.
+  const [agents, setAgents] = useState([]);
+  const [agentPage, setAgentPage] = useState(1);
+  const [agentTotalPages, setAgentTotalPages] = useState(1);
+  const [loadingAgents, setLoadingAgents] = useState(false);
+  const agentRequest = useRef(0);
 
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedAgentIds, setSelectedAgentIds] = useState([]);
@@ -30,17 +39,17 @@ export function AssignmentsManager({ initialCourseId = null }) {
     const init = async () => {
       setLoadingDetail(true);
       try {
-        const coursesRes = await api.courses.list({ status: 'published', limit: 100 });
-        setCourses(coursesRes.data.filter(c => c.status === 'published' || !c.status));
-
-        const usersRes = await api.users.list({ role: 'agent', status: 'active', limit: 100 });
-        setAllAgents(usersRes.data);
-
         if (initialCourseId) {
-          const cohortRes = await api.assignments.getCourseAssignments(initialCourseId);
+          // Loaded directly, so draft courses show their title and stats too.
+          const [course, cohortRes] = await Promise.all([
+            api.courses.getById(initialCourseId),
+            api.assignments.getCourseAssignments(initialCourseId)
+          ]);
+          setCurrentCourse(course);
           setAssignments(cohortRes);
           setSelectedCourseId(Number(initialCourseId));
         } else {
+          setCurrentCourse(null);
           setSelectedCourseId(null);
           setAssignments([]);
         }
@@ -53,6 +62,32 @@ export function AssignmentsManager({ initialCourseId = null }) {
     };
     init();
   }, [initialCourseId]);
+
+  const loadAgents = async (search, page) => {
+    const requestId = ++agentRequest.current;
+    setLoadingAgents(true);
+    try {
+      const res = await api.users.list({
+        role: 'agent', status: 'active', search, page, limit: AGENT_PAGE_SIZE
+      });
+      // A newer search may have started while this one was in flight.
+      if (requestId !== agentRequest.current) return;
+      setAgents(prev => (page === 1 ? res.data : [...prev, ...res.data]));
+      setAgentPage(page);
+      setAgentTotalPages(res.pagination.totalPages || 1);
+    } catch (err) {
+      if (requestId === agentRequest.current) setError(err);
+    } finally {
+      if (requestId === agentRequest.current) setLoadingAgents(false);
+    }
+  };
+
+  // Reload the first page whenever the picker opens or the search changes.
+  useEffect(() => {
+    if (!isAssignModalOpen) return undefined;
+    const timer = setTimeout(() => loadAgents(agentSearch.trim(), 1), 250);
+    return () => clearTimeout(timer);
+  }, [isAssignModalOpen, agentSearch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleBack = () => {
     navigate(paths.managerCourses);
@@ -117,13 +152,10 @@ export function AssignmentsManager({ initialCourseId = null }) {
     }
   };
 
-  const currentCourse = courses.find(c => c.id === Number(selectedCourseId));
   const assignedAgentIdSet = new Set(assignments.map(a => a.agent_id));
-  const unassignedAgents = allAgents.filter(a => !assignedAgentIdSet.has(a.id));
-  const filteredUnassigned = unassignedAgents.filter(a =>
-    a.name.toLowerCase().includes(agentSearch.toLowerCase()) ||
-    a.email.toLowerCase().includes(agentSearch.toLowerCase())
-  );
+  // The server already applied the search; only enrolled agents are hidden here.
+  const filteredUnassigned = agents.filter(a => !assignedAgentIdSet.has(a.id));
+  const hasMoreAgents = agentPage < agentTotalPages;
 
   return (
     <div className="space-y-8">
@@ -335,7 +367,11 @@ export function AssignmentsManager({ initialCourseId = null }) {
           <div className="border border-zinc-200 dark:border-zinc-800 rounded-lg max-h-60 overflow-y-auto divide-y divide-zinc-200 dark:divide-zinc-800">
             {filteredUnassigned.length === 0 ? (
               <div className="py-8 text-center text-xs text-zinc-400">
-                {agentSearch ? 'No matching unassigned agents.' : 'All active agents are already enrolled in this course.'}
+                {loadingAgents
+                  ? 'Loading agents…'
+                  : hasMoreAgents
+                    ? 'Everyone shown so far is already enrolled. Load more to see the rest.'
+                    : agentSearch ? 'No matching unassigned agents.' : 'All active agents are already enrolled in this course.'}
               </div>
             ) : (
               filteredUnassigned.map((agent) => {
@@ -368,6 +404,19 @@ export function AssignmentsManager({ initialCourseId = null }) {
                   </div>
                 );
               })
+            )}
+            {hasMoreAgents && (
+              <div className="p-2 text-center">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  disabled={loadingAgents}
+                  onClick={() => loadAgents(agentSearch.trim(), agentPage + 1)}
+                >
+                  {loadingAgents ? 'Loading…' : 'Load more agents'}
+                </Button>
+              </div>
             )}
           </div>
 

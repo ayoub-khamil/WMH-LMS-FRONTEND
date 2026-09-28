@@ -148,11 +148,9 @@ export function CoursesList({ onSelectCourse, onManageAssignments }) {
       ) : (
         <div className="space-y-4 w-full">
           {courses.map((course) => {
-            const sectionsCount = course.sections?.length || 0;
-            const itemsCount = (course.sections || []).reduce(
-              (acc, s) => acc + (s.items?.length || 0),
-              0
-            );
+            // The list endpoint returns counts, not the full course tree.
+            const sectionsCount = course.sections_count || 0;
+            const itemsCount = course.items_count || 0;
 
             return (
               <div

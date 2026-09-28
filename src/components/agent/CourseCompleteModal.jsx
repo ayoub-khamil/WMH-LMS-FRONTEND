@@ -4,14 +4,15 @@ import { Button } from '../common/Button';
 import { downloadCertificatePDF } from '../../services/certificate';
 import { IconAcademicCap, IconDownload, IconCheck } from '../common/Icons';
 
-export function CourseCompleteModal({ isOpen, onClose, course, agentName, onReturnToDashboard }) {
+export function CourseCompleteModal({ isOpen, onClose, course, completedAt, agentName, onReturnToDashboard }) {
   if (!isOpen || !course) return null;
 
   const handleDownload = () => {
     downloadCertificatePDF({
       agentName: agentName || 'Frontline Specialist',
       courseTitle: course.title,
-      completionDate: new Date().toISOString(),
+      // The date the server recorded; today only until that has loaded.
+      completionDate: completedAt || new Date().toISOString(),
       courseId: course.id
     });
   };
