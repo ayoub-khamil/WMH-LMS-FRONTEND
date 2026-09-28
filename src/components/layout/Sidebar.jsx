@@ -12,7 +12,8 @@ import {
   IconAudio,
   IconDownload,
   IconCheck,
-  IconLock
+  IconLock,
+  IconClock
 } from '../common/Icons';
 import { downloadCertificatePDF } from '../../services/certificate';
 import { reportError } from '../../services/logger';
@@ -364,6 +365,8 @@ export function Sidebar({
           {[
             { id: 'manager_courses',     label: 'Course Catalog & Tree',   icon: IconBook    },
             { id: 'manager_users',       label: 'Agent & User Roster',      icon: IconUsers   },
+            // Root only: the trail records what the other managers did.
+            ...(user?.is_root ? [{ id: 'manager_audit', label: 'Audit Log', icon: IconClock }] : []),
           ].map(item => {
             const Icon = item.icon;
             const isActive = currentView === item.id

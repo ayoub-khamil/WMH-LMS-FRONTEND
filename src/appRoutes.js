@@ -11,11 +11,13 @@ export const paths = {
   managerEditorItem: (courseId, itemId) => `/manager/courses/${courseId}/items/${itemId}`,
   managerCourseAssignments: (courseId) => `/manager/courses/${courseId}/assignments`,
   managerUsers: '/manager/users',
+  managerAudit: '/manager/audit',
 };
 
 export function viewFromPath(pathname) {
   if (/\/assignments(?:\/|$)/.test(pathname)) return 'manager_assignments';
   if (pathname === '/manager/users' || pathname.startsWith('/manager/users/')) return 'manager_users';
+  if (pathname === '/manager/audit') return 'manager_audit';
   if (/^\/manager\/courses\/[^/]+/.test(pathname)) return 'manager_course_editor';
   if (pathname.startsWith('/manager')) return 'manager_courses';
   if (pathname.startsWith('/learn/') && pathname !== '/learn/') return 'agent_course_viewer';

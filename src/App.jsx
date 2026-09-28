@@ -24,6 +24,8 @@ const AssignmentsManager = React.lazy(() =>
   import('./components/manager/AssignmentsManager').then(m => ({ default: m.AssignmentsManager })));
 const UserManagement = React.lazy(() =>
   import('./components/manager/UserManagement').then(m => ({ default: m.UserManagement })));
+const AuditLog = React.lazy(() =>
+  import('./components/manager/AuditLog').then(m => ({ default: m.AuditLog })));
 const AgentDashboard = React.lazy(() =>
   import('./components/agent/AgentDashboard').then(m => ({ default: m.AgentDashboard })));
 const CourseViewer = React.lazy(() =>
@@ -39,6 +41,14 @@ function HomeRedirect() {
 function ManagerOnly({ children }) {
   const { isManager } = useAuth();
   if (!isManager) return <Navigate to={paths.learn} replace />;
+  return children;
+}
+
+// The audit trail records what managers did, so only root may read it
+// (the API enforces this too; this just keeps other managers off the page).
+function RootOnly({ children }) {
+  const { user } = useAuth();
+  if (!user?.is_root) return <Navigate to={paths.managerCourses} replace />;
   return children;
 }
 
@@ -146,6 +156,11 @@ function AppLayout() {
           title: 'Course Assignments',
           breadcrumbs: [{ label: 'Manager Console' }, { label: 'Assignments' }]
         };
+      case 'manager_audit':
+        return {
+          title: 'Audit Log',
+          breadcrumbs: [{ label: 'Manager Console' }, { label: 'Audit Log' }]
+        };
       case 'manager_users':
         return {
           title: 'Agent & User Roster',
@@ -170,6 +185,7 @@ function AppLayout() {
               if (view === 'agent_dashboard') navigate(paths.learn);
               else if (view === 'manager_courses') navigate(paths.managerCourses);
               else if (view === 'manager_users') navigate(paths.managerUsers);
+              else if (view === 'manager_audit') navigate(paths.managerAudit);
               else if (view === 'agent_course_viewer' && selectedCourseId) {
                 navigate(selectedItemId
                   ? paths.item(selectedCourseId, selectedItemId)
@@ -300,6 +316,10 @@ function AppContent() {
         <Route
           path="/manager/users"
           element={<ManagerOnly><ManagerUsersPage /></ManagerOnly>}
+        />
+        <Route
+          path="/manager/audit"
+          element={<ManagerOnly><RootOnly><AuditLog /></RootOnly></ManagerOnly>}
         />
         <Route path="*" element={<HomeRedirect />} />
       </Route>

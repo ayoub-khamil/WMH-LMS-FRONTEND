@@ -3,6 +3,7 @@ import { usersApi } from './users.api';
 import { coursesApi } from './courses.api';
 import { assignmentsApi } from './assignments.api';
 import { learnApi } from './learn.api';
+import { auditApi } from './audit.api';
 
 /**
  * API-ready barrel. Same `api.{auth,users,courses,assignments,learn}`
@@ -10,6 +11,9 @@ import { learnApi } from './learn.api';
  * No localStorage DB, no seed data, no fake latency.
  */
 export const api = {
+  audit: {
+    recent: (limit) => auditApi.recent(limit)
+  },
   auth: {
     login: (email, password) => authApi.login(email, password),
     me: () => authApi.me(),
