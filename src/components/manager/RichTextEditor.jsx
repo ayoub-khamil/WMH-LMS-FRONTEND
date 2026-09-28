@@ -3,6 +3,7 @@ import { useEditor, useEditorState, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { TableKit } from '@tiptap/extension-table';
 import { toEditableHtml } from '../../services/richText';
+import { IconUndo, IconRedo } from '../common/Icons';
 
 /**
  * Paste-and-publish editor for text items. A manager copies from Word,
@@ -42,8 +43,6 @@ export function RichTextEditor({ value, onChange }) {
       bold: ed?.isActive('bold') ?? false,
       italic: ed?.isActive('italic') ?? false,
       underline: ed?.isActive('underline') ?? false,
-      h2: ed?.isActive('heading', { level: 2 }) ?? false,
-      h3: ed?.isActive('heading', { level: 3 }) ?? false,
       bullet: ed?.isActive('bulletList') ?? false,
       ordered: ed?.isActive('orderedList') ?? false,
       link: ed?.isActive('link') ?? false,
@@ -68,16 +67,13 @@ export function RichTextEditor({ value, onChange }) {
     { label: 'I', title: 'Italic', active: state.italic, run: () => editor.chain().focus().toggleItalic().run(), className: 'italic font-serif' },
     { label: 'U', title: 'Underline', active: state.underline, run: () => editor.chain().focus().toggleUnderline().run(), className: 'underline' },
     { divider: true },
-    { label: 'H2', title: 'Heading', active: state.h2, run: () => editor.chain().focus().toggleHeading({ level: 2 }).run() },
-    { label: 'H3', title: 'Subheading', active: state.h3, run: () => editor.chain().focus().toggleHeading({ level: 3 }).run() },
-    { divider: true },
     { label: '• List', title: 'Bullet list', active: state.bullet, run: () => editor.chain().focus().toggleBulletList().run() },
     { label: '1. List', title: 'Numbered list', active: state.ordered, run: () => editor.chain().focus().toggleOrderedList().run() },
     { label: 'Link', title: 'Add or edit link', active: state.link, run: setLink },
     { divider: true },
     { label: 'Clear', title: 'Clear formatting', run: () => editor.chain().focus().unsetAllMarks().clearNodes().run() },
-    { label: 'Undo', title: 'Undo', disabled: !state.canUndo, run: () => editor.chain().focus().undo().run() },
-    { label: 'Redo', title: 'Redo', disabled: !state.canRedo, run: () => editor.chain().focus().redo().run() }
+    { icon: IconUndo, title: 'Undo', disabled: !state.canUndo, run: () => editor.chain().focus().undo().run() },
+    { icon: IconRedo, title: 'Redo', disabled: !state.canRedo, run: () => editor.chain().focus().redo().run() }
   ];
 
   return (
@@ -91,6 +87,7 @@ export function RichTextEditor({ value, onChange }) {
               key={b.title}
               type="button"
               title={b.title}
+              aria-label={b.title}
               aria-pressed={b.active ?? undefined}
               disabled={b.disabled}
               onMouseDown={(e) => e.preventDefault()}
@@ -101,7 +98,7 @@ export function RichTextEditor({ value, onChange }) {
                   : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/70 dark:hover:bg-zinc-800'
               }`}
             >
-              {b.label}
+              {b.icon ? <b.icon className="w-4 h-4" /> : b.label}
             </button>
           )
         )}
