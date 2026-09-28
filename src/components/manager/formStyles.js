@@ -5,9 +5,9 @@
  * border and a lighter fill, and every field has its own border and fill.
  */
 
-/** A bordered panel that stands off the page. */
+/** A bordered panel that stands off the page, in a lighter tint of the page cream. */
 export const CARD =
-  'rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-5 space-y-4';
+  'rounded-xl border border-zinc-200 dark:border-zinc-700 bg-[#FBFCF6] dark:bg-zinc-900 p-5 space-y-4';
 
 /** Card heading with a divider underneath. */
 export const CARD_TITLE =
