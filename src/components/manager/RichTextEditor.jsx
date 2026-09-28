@@ -45,22 +45,12 @@ export function RichTextEditor({ value, onChange }) {
       underline: ed?.isActive('underline') ?? false,
       bullet: ed?.isActive('bulletList') ?? false,
       ordered: ed?.isActive('orderedList') ?? false,
-      link: ed?.isActive('link') ?? false,
       canUndo: ed?.can().undo() ?? false,
       canRedo: ed?.can().redo() ?? false
     })
   });
 
   if (!editor) return null;
-
-  const setLink = () => {
-    const previous = editor.getAttributes('link').href || '';
-    const url = window.prompt('Link address (leave empty to remove the link)', previous);
-    if (url === null) return;
-    const chain = editor.chain().focus().extendMarkRange('link');
-    if (!url.trim()) chain.unsetLink().run();
-    else chain.setLink({ href: url.trim() }).run();
-  };
 
   const buttons = [
     { label: 'B', title: 'Bold', active: state.bold, run: () => editor.chain().focus().toggleBold().run(), className: 'font-black' },
@@ -69,7 +59,6 @@ export function RichTextEditor({ value, onChange }) {
     { divider: true },
     { label: '• List', title: 'Bullet list', active: state.bullet, run: () => editor.chain().focus().toggleBulletList().run() },
     { label: '1. List', title: 'Numbered list', active: state.ordered, run: () => editor.chain().focus().toggleOrderedList().run() },
-    { label: 'Link', title: 'Add or edit link', active: state.link, run: setLink },
     { divider: true },
     { label: 'Clear', title: 'Clear formatting', run: () => editor.chain().focus().unsetAllMarks().clearNodes().run() },
     { icon: IconUndo, title: 'Undo', disabled: !state.canUndo, run: () => editor.chain().focus().undo().run() },
