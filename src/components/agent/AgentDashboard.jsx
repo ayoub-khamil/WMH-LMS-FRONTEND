@@ -18,8 +18,7 @@ import {
   IconSun, 
   IconMoon 
 } from '../common/Icons';
-import lightLogoSrc from '/assets/newTransparentLogo.png';
-import darkLogoSrc from '/assets/darkModeLogo.png';
+import { BrandLogo } from '../common/BrandLogo';
 import { reportError } from '../../services/logger';
 
 export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
@@ -80,11 +79,9 @@ export function AgentDashboard({ onLaunchCourse, refreshTrigger = 0 }) {
         
         {/* Left: Logo */}
         <div className="flex-1 flex items-end min-w-0">
-          <img
-            src={theme === 'dark' ? darkLogoSrc : lightLogoSrc}
-            alt="WatermelonHub"
-            className="h-[64px] w-auto object-contain mb-1"
-          />
+          <div className="mb-1">
+            <BrandLogo className="h-[64px]" />
+          </div>
         </div>
 
         {/* Center: Tabs */}

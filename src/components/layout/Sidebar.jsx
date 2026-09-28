@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
 import { api } from '../../services/api';
-import lightLogoSrc from '/assets/newTransparentLogo.png';
-import darkLogoSrc from '/assets/darkModeLogo.png';
+import { BrandLogo } from '../common/BrandLogo';
 import {
   IconBook,
   IconUsers,
@@ -83,7 +81,6 @@ export function Sidebar({
   refreshTrigger = 0
 }) {
   const { user, role, isManager } = useAuth();
-  const { theme } = useTheme();
 
   const [agentCourses,    setAgentCourses]    = useState([]);
   const [activeCourseTree, setActiveCourseTree] = useState(null);
@@ -205,11 +202,7 @@ export function Sidebar({
 
       {/* ── Brand Header with Logo on Left, Back Button on Opposite (Right) Side ──────────────── */}
       <div className="h-20 flex items-center justify-between gap-3 px-4 border-b border-zinc-100 dark:border-zinc-900 bg-[#F7F8ED] dark:bg-zinc-950 flex-shrink-0">
-        <img
-          src={theme === 'dark' ? darkLogoSrc : lightLogoSrc}
-          alt="WatermelonHub"
-          className="h-[64px] w-auto object-contain min-w-0"
-        />
+        <BrandLogo className="h-[64px]" />
         {!isManager && (
           <button
             onClick={() => onViewChange('agent_dashboard')}

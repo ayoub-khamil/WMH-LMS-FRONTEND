@@ -10,8 +10,7 @@ import {
   IconEye,
   IconEyeSlash
 } from '../common/Icons';
-import lightLogoSrc from '/assets/newTransparentLogo.png';
-import darkLogoSrc from '/assets/darkModeLogo.png';
+import { BrandLogo } from '../common/BrandLogo';
 import loginBgSrc from '/assets/wmh lms login screen background.png';
 
 export function LoginScreen({ onLoginSuccess }) {
@@ -79,11 +78,7 @@ export function LoginScreen({ onLoginSuccess }) {
           
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <img
-              src={theme === 'dark' ? darkLogoSrc : lightLogoSrc}
-              alt="WatermelonHub"
-              className="h-[88px] w-auto object-contain"
-            />
+            <BrandLogo className="h-[88px]" />
           </div>
 
           <div className="text-center mb-8">
