@@ -9,6 +9,7 @@ import { YouTubePlayer } from './YouTubePlayer';
 import { TextItemViewer } from './TextItemViewer';
 import { QuizPlayer } from './QuizPlayer';
 import { CourseCompleteModal } from './CourseCompleteModal';
+import { NotesPanel } from './NotesPanel';
 import { markQuizContentReviewed } from '../../services/quizCooldownStore';
 import {
   IconArrowLeft,
@@ -19,7 +20,8 @@ import {
   IconQuestionMarkCircle,
   IconAudio,
   IconBook,
-  IconLock
+  IconLock,
+  IconNote
 } from '../common/Icons';
 import { reportError } from '../../services/logger';
 
@@ -30,8 +32,9 @@ export function CourseViewer({
   onSelectItem,
   onProgressUpdated
 }) {
-  const { user } = useAuth();
+  const { user, isManager } = useAuth();
   const [course, setCourse] = useState(null);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [completedItemIds, setCompletedItemIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
@@ -204,7 +207,9 @@ export function CourseViewer({
   const progressPercent = Math.round((completedCount / (allItems.length || 1)) * 100);
 
   return (
-    <div className="min-h-full flex flex-col justify-between pb-16">
+    // On wide screens the open notes panel pushes the content aside rather
+    // than covering it, so a video stays fully visible while notes are taken.
+    <div className={`min-h-full flex flex-col justify-between pb-16 transition-[padding] duration-200 ${notesOpen ? 'lg:pr-[380px]' : ''}`}>
 
       {/* Main Single-Item Focus Container */}
       <div className="flex-1 max-w-4xl w-full mx-auto px-6 py-10">
@@ -240,6 +245,22 @@ export function CourseViewer({
               <Badge variant="completed" className="px-3 py-1 font-bold text-xs">
                 <IconCheck className="w-4 h-4 mr-1.5" /> COMPLETED
               </Badge>
+            )}
+            {!isManager && (
+              <button
+                type="button"
+                onClick={() => setNotesOpen(open => !open)}
+                aria-expanded={notesOpen}
+                aria-label="My notes"
+                title="My notes"
+                className={`p-2 rounded-full border transition-colors ${
+                  notesOpen
+                    ? 'bg-watermelon-green-400 border-watermelon-green-500 text-zinc-950'
+                    : 'bg-[#F7F8ED] dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white'
+                }`}
+              >
+                <IconNote className="w-4 h-4" />
+              </button>
             )}
           </div>
         </div>
@@ -338,6 +359,18 @@ export function CourseViewer({
           </div>
         )}
       </div>
+
+      {!isManager && (
+        <NotesPanel
+          key={course.id}
+          isOpen={notesOpen}
+          onClose={() => setNotesOpen(false)}
+          courseId={course.id}
+          currentItem={currentItem}
+          items={allItems}
+          onSelectItem={(id) => onSelectItem(id)}
+        />
+      )}
 
       {/* Completion Modal */}
       <CourseCompleteModal

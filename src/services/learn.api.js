@@ -9,6 +9,8 @@ import { http } from './httpClient';
  * POST /learn/quiz/submit {item_id,course_id,agent_id,answers}
  * POST /learn/views {agent_id,course_id,viewed_item_id} (review gate)
  * GET  /learn/quiz/lock?agent_id&item_id (server lock status)
+ * GET  /learn/courses/:id/notes            -> [{item_id, body, updated_at}]
+ * PUT  /learn/notes/:itemId {course_id, body} (empty body deletes)
  *
  * NOTE: sessionStorage (services/quizCooldownStore.js) remains as a fast
  * local mirror, but the server lock is authoritative and survives reloads.
@@ -50,5 +52,14 @@ export const learnApi = {
   },
   getQuizLock(agentId, itemId) {
     return http.get('/learn/quiz/lock', { params: { agent_id: agentId, item_id: itemId } });
+  },
+
+  // Notes are always the signed-in agent's own; there is no agent_id.
+  getNotes(courseId) {
+    return http.get(`/learn/courses/${courseId}/notes`);
+  },
+  /** Creates or replaces the note for one item. An empty body deletes it. */
+  saveNote(itemId, courseId, body) {
+    return http.put(`/learn/notes/${itemId}`, { course_id: courseId, body });
   }
 };
