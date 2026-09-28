@@ -66,11 +66,11 @@ export function RichTextEditor({ value, onChange }) {
   ];
 
   return (
-    <div className="rounded-lg bg-[#F7F8ED] dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus-within:ring-2 focus-within:ring-watermelon-green-400 overflow-hidden">
-      <div className="flex flex-wrap items-center gap-1 px-2 py-1.5 border-b border-zinc-200 dark:border-zinc-800" role="toolbar" aria-label="Formatting">
+    <div className="rounded-lg bg-[#F7F8ED] dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-700 focus-within:border-watermelon-green-500 focus-within:ring-2 focus-within:ring-watermelon-green-400/40 overflow-hidden transition-colors">
+      <div className="flex flex-wrap items-center gap-1 px-2 py-1.5 bg-zinc-100 dark:bg-zinc-800/70 border-b border-zinc-300 dark:border-zinc-700" role="toolbar" aria-label="Formatting">
         {buttons.map((b, idx) =>
           b.divider ? (
-            <span key={`d${idx}`} className="w-px h-5 mx-1 bg-zinc-200 dark:bg-zinc-700" />
+            <span key={`d${idx}`} className="w-px h-5 mx-1 bg-zinc-300 dark:bg-zinc-600" />
           ) : (
             <button
               key={b.title}
@@ -84,7 +84,7 @@ export function RichTextEditor({ value, onChange }) {
               className={`px-2 py-1 text-xs rounded transition-colors disabled:opacity-30 ${b.className || 'font-bold'} ${
                 b.active
                   ? 'bg-watermelon-green-400 text-zinc-950'
-                  : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200/70 dark:hover:bg-zinc-800'
+                  : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
               }`}
             >
               {b.icon ? <b.icon className="w-4 h-4" /> : b.label}

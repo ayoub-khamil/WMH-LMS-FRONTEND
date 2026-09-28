@@ -7,6 +7,7 @@ import { Modal } from '../common/Modal';
 import { EmptyState } from '../common/EmptyState';
 import { Select } from '../common/Select';
 import { IconPlus, IconTrash, IconPencil, IconQuestionMarkCircle, IconCheck } from '../common/Icons';
+import { LABEL, HINT, INPUT, SELECT_BUTTON } from './formStyles';
 
 export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -152,12 +153,12 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
   return (
     <div className="space-y-4">
       <ErrorBanner error={error} />
-      <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
+      <div className="flex items-center justify-between gap-4 pb-3 border-b border-zinc-200 dark:border-zinc-800">
         <div>
-          <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <h4 className="text-xs font-black text-zinc-800 dark:text-zinc-200 uppercase tracking-wider">
             Assessment Questions ({questions.length})
           </h4>
-          <p className="text-xs text-zinc-500">
+          <p className="mt-1 text-[11px] font-medium text-zinc-500 dark:text-zinc-400">
             Agents must score 100% on this assessment to complete the module.
           </p>
         </div>
@@ -184,7 +185,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
           {questions.map((q, idx) => (
             <div
               key={q.id}
-              className="p-4 rounded-md border border-zinc-200 dark:border-zinc-800 bg-[#F7F8ED]/50 dark:bg-zinc-900/40 flex flex-col space-y-2"
+              className="p-4 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-[#F7F8ED] dark:bg-zinc-950 flex flex-col space-y-3"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
@@ -201,13 +202,17 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
                   </Badge>
                   <button
                     onClick={() => openEditModal(q)}
-                    className="p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 rounded"
+                    title="Edit question"
+                    aria-label="Edit question"
+                    className="p-1.5 text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded border border-zinc-300 dark:border-zinc-700"
                   >
                     <IconPencil className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleDeleteQuestion(q.id)}
-                    className="p-1 text-rose-400 hover:text-rose-600 rounded"
+                    title="Delete question"
+                    aria-label="Delete question"
+                    className="p-1.5 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded border border-zinc-300 dark:border-zinc-700"
                   >
                     <IconTrash className="w-3.5 h-3.5" />
                   </button>
@@ -215,14 +220,14 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
               </div>
 
               {/* Options Preview */}
-              <div className="pl-6 space-y-1">
+              <div className="ml-6 pl-3 space-y-1.5 border-l-2 border-zinc-200 dark:border-zinc-800">
                 {q.options?.map((opt) => (
                   <div key={opt.id} className="flex items-center space-x-2 text-xs">
                     <span
                       className={`w-3.5 h-3.5 rounded flex items-center justify-center border ${
                         opt.is_correct
                           ? 'bg-emerald-100 border-emerald-400 text-emerald-800 dark:bg-emerald-950 dark:border-emerald-700 dark:text-emerald-300'
-                          : 'border-zinc-300 dark:border-zinc-700'
+                          : 'border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900'
                       }`}
                     >
                       {opt.is_correct && <IconCheck className="w-2.5 h-2.5" />}
@@ -252,9 +257,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
       >
         <form onSubmit={handleSaveQuestion} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1.5">
-              Question Type
-            </label>
+            <span className={LABEL}>Question Type</span>
             <Select
               value={type}
               onChange={(e) => handleTypeChange(e.target.value)}
@@ -264,33 +267,31 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
                 { value: 'true_false', label: 'True / False' }
               ]}
               className="w-full"
+              buttonClassName={SELECT_BUTTON}
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1.5">
-              Question Prompt *
-            </label>
+            <label htmlFor="question-prompt" className={LABEL}>Question Prompt *</label>
             <textarea
+              id="question-prompt"
               rows={2}
               required
               placeholder="e.g. Which of the following customer actions requires an instant Tier 2 escalation?"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
+              className={INPUT}
             />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1.5">
-                Answer Options & Correct Answer Key
-              </label>
+              <span className={`${LABEL} mb-0`}>Answer Options & Correct Answer Key</span>
               {type !== 'true_false' && (
                 <button
                   type="button"
                   onClick={addOption}
-                  className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 font-medium"
+                  className="px-2 py-1 rounded border border-zinc-300 dark:border-zinc-700 text-xs font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 >
                   + Add Option
                 </button>
@@ -307,7 +308,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
                     className={`flex-shrink-0 w-6 h-6 rounded flex items-center justify-center border transition-colors ${
                       opt.is_correct
                         ? 'bg-emerald-400 border-emerald-500 text-zinc-950 font-bold'
-                        : 'border-zinc-300 dark:border-zinc-700 bg-[#F7F8ED] dark:bg-zinc-800 text-transparent'
+                        : 'border-zinc-400 dark:border-zinc-600 bg-white dark:bg-zinc-950 text-transparent hover:border-emerald-500'
                     }`}
                   >
                     <IconCheck className="w-3.5 h-3.5" />
@@ -320,7 +321,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
                     placeholder={`Option ${idx + 1}`}
                     value={opt.text}
                     onChange={(e) => handleOptionTextChange(idx, e.target.value)}
-                    className="flex-1 px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium disabled:opacity-60"
+                    className={`flex-1 ${INPUT}`}
                   />
 
                   {type !== 'true_false' && options.length > 2 && (
@@ -335,7 +336,7 @@ export function QuizQuestionEditor({ itemId, questions = [], onQuestionsUpdated 
                 </div>
               ))}
             </div>
-            <p className="text-[11px] text-zinc-400 mt-1.5">
+            <p className={HINT}>
               Click the checkmark icon on the left to set the correct answer(s).
             </p>
           </div>

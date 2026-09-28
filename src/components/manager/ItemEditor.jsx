@@ -6,6 +6,7 @@ import { Badge } from '../common/Badge';
 import { Select } from '../common/Select';
 import { QuizQuestionEditor } from './QuizQuestionEditor';
 import { RichTextEditor } from './RichTextEditor';
+import { CARD, CARD_TITLE, LABEL, HINT, INPUT, SELECT_BUTTON, PLACEHOLDER } from './formStyles';
 import { IconVideo, IconDocumentText, IconQuestionMarkCircle, IconAudio, IconArrowLeft } from '../common/Icons';
 import { reportError } from '../../services/logger';
 
@@ -87,74 +88,63 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Left Column: Item Settings */}
-        <div className="lg:col-span-1 space-y-4">
-          <div className="flat-card p-4 space-y-4">
-            <h4 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-              Item Configuration
-            </h4>
+        <div className={`lg:col-span-1 ${CARD}`}>
+          <h4 className={CARD_TITLE}>Item Configuration</h4>
 
-            <div>
-              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1.5">
-                Item Title *
-              </label>
-              <input
-                type="text"
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1.5">
-                Content Type
-              </label>
-              <Select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                options={[
-                  { value: 'video', label: 'Video (Unlisted YouTube)' },
-                  { value: 'text', label: 'Text Document / Guide' },
-                  { value: 'quiz', label: 'Assessment / Quiz' },
-                  { value: 'audio', label: 'Audio Track' }
-                ]}
-                className="w-full"
-              />
-            </div>
-
-            {/* Type Specific Fields */}
-            {(type === 'video' || type === 'audio') && (
-              <div>
-                <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1.5">
-                  YouTube Content URL *
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  value={contentUrl}
-                  onChange={(e) => setContentUrl(e.target.value)}
-                  className="w-full px-4 py-2.5 text-sm bg-[#F7F8ED] dark:bg-zinc-900 border-0 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-watermelon-green-400 font-medium"
-                />
-                <p className="text-[11px] text-zinc-400 mt-1">
-                  Supports standard and unlisted YouTube links.
-                </p>
-              </div>
-            )}
+          <div>
+            <label htmlFor="item-title" className={LABEL}>Item Title *</label>
+            <input
+              id="item-title"
+              type="text"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className={INPUT}
+            />
           </div>
+
+          <div>
+            <span className={LABEL}>Content Type</span>
+            <Select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              options={[
+                { value: 'video', label: 'Video (Unlisted YouTube)' },
+                { value: 'text', label: 'Text Document / Guide' },
+                { value: 'quiz', label: 'Assessment / Quiz' },
+                { value: 'audio', label: 'Audio Track' }
+              ]}
+              className="w-full"
+              buttonClassName={SELECT_BUTTON}
+            />
+          </div>
+
+          {/* Type Specific Fields */}
+          {(type === 'video' || type === 'audio') && (
+            <div>
+              <label htmlFor="item-url" className={LABEL}>YouTube Content URL *</label>
+              <input
+                id="item-url"
+                type="url"
+                placeholder="https://www.youtube.com/watch?v=..."
+                value={contentUrl}
+                onChange={(e) => setContentUrl(e.target.value)}
+                className={INPUT}
+              />
+              <p className={HINT}>Supports standard and unlisted YouTube links.</p>
+            </div>
+          )}
         </div>
 
         {/* Right Column: Content Body or Quiz Editor */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className={`lg:col-span-2 ${CARD}`}>
           {type === 'video' && (
-            <div className="flat-card p-4 space-y-3">
-              <h4 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                Video Embed Preview
-              </h4>
+            <>
+              <h4 className={CARD_TITLE}>Video Embed Preview</h4>
               {embedUrl ? (
-                <div className="aspect-video w-full rounded border border-zinc-200 dark:border-zinc-800 bg-black overflow-hidden">
+                <div className="aspect-video w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-black overflow-hidden">
                   <iframe
                     src={embedUrl}
                     title="Video Player"
@@ -164,42 +154,38 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
                   />
                 </div>
               ) : (
-                <div className="aspect-video flex items-center justify-center border border-dashed border-zinc-300 dark:border-zinc-700 rounded bg-[#F7F8ED] dark:bg-zinc-900/50 text-xs text-zinc-400">
+                <div className={`aspect-video ${PLACEHOLDER}`}>
                   Enter a valid YouTube URL on the left to preview the video player embed.
                 </div>
               )}
-            </div>
+            </>
           )}
 
           {type === 'text' && (
-            <div className="flat-card p-4 space-y-3">
-              <h4 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                Text Content
-              </h4>
-              <p className="text-[11px] text-zinc-400">
-                Paste straight from Word, Google Docs or a PDF. Headings, lists, tables and links are kept; fonts, colours and images are dropped.
-              </p>
+            <>
+              <div className={CARD_TITLE}>
+                <h4>Text Content</h4>
+                <p className="mt-1 text-[11px] font-medium normal-case tracking-normal text-zinc-500 dark:text-zinc-400">
+                  Paste straight from Word, Google Docs or a PDF. Headings, lists, tables and links are kept; fonts, colours and images are dropped.
+                </p>
+              </div>
               <RichTextEditor value={textContent} onChange={setTextContent} />
-            </div>
+            </>
           )}
 
           {type === 'quiz' && (
-            <div className="flat-card p-4">
-              <QuizQuestionEditor
-                itemId={item.id}
-                questions={questions}
-                onQuestionsUpdated={refreshQuestions}
-              />
-            </div>
+            <QuizQuestionEditor
+              itemId={item.id}
+              questions={questions}
+              onQuestionsUpdated={refreshQuestions}
+            />
           )}
 
           {type === 'audio' && (
-            <div className="flat-card p-4 space-y-3">
-              <h4 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                Audio Stream Preview
-              </h4>
+            <>
+              <h4 className={CARD_TITLE}>Audio Stream Preview</h4>
               {embedUrl ? (
-                <div className="h-40 w-full rounded border border-zinc-200 dark:border-zinc-800 bg-zinc-900 overflow-hidden">
+                <div className="h-40 w-full rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-900 overflow-hidden">
                   <iframe
                     src={embedUrl}
                     title="Audio Player"
@@ -208,11 +194,11 @@ export function ItemEditor({ item, onBack, onSaveSuccess }) {
                   />
                 </div>
               ) : (
-                <div className="h-32 flex items-center justify-center border border-dashed border-zinc-300 dark:border-zinc-700 rounded bg-[#F7F8ED] dark:bg-zinc-900/50 text-xs text-zinc-400">
-                  Enter an audio stream URL to preview.
+                <div className={`h-32 ${PLACEHOLDER}`}>
+                  Enter an audio stream URL on the left to preview.
                 </div>
               )}
-            </div>
+            </>
           )}
         </div>
       </div>
